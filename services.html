@@ -704,8 +704,13 @@
         }
 
         window.openGeneralModal = function() {
-             serviceSelect.selectedIndex = 0; 
-             window.openModal('Consultation', '₱1,000', 'images/tcm-850x567 (1).jpg');
+            const scrollbarWidth = getScrollbarWidth();
+            document.body.style.paddingRight = `${scrollbarWidth}px`;
+
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+            document.body.style.overflow = 'hidden';
+            updateModalContext(serviceSelect);
         }
 
         window.closeModal = function() {
