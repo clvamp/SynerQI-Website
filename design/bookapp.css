@@ -272,6 +272,14 @@
         max-height: none;
         padding: 25px;
     }
+   .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0; 
+    }
+    .form-row .form-group {
+        width: 100%; 
+    }
 }
 
 /* D. Animations */
