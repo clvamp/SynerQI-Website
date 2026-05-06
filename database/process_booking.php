@@ -7,32 +7,33 @@ if ($conn->connect_error) {
 }
 
 $success = false;
+$generated_id = 0;
 
-// 2. CAPTURE DATA
+// 2. CAPTURE DATA & ALIGN WITH WEBADMIN VARIABLES
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userName'])) {
-    $userName      = $_POST['userName'];
-    $userEmail     = $_POST['userEmail'];
-    $userPhone     = $_POST['userPhone'];
-    $bookingDate   = $_POST['date']; 
-    $bookingTime   = $_POST['bookingTime'];
-    $services      = $_POST['selectedServicesList']; // From hidden input
-    $totalAmount   = $_POST['totalAmount'];           // From hidden input
+    $patient_name = $conn->real_escape_string($_POST['userName']);
+    $userEmail    = $conn->real_escape_string($_POST['userEmail']);
+    $telephone    = $conn->real_escape_string($_POST['userPhone']);
+    $bookingDate  = $_POST['date']; 
+    $bookingTime  = $_POST['bookingTime'];
+    $services     = $conn->real_escape_string($_POST['selectedServicesList']); 
+    $totalAmount  = intval($_POST['totalAmount']);
 
-    if ($bookingTime == "Morning (9AM - 12PM)") {
-        $time = "09:00:00";
-    } else {
-        $time = "13:00:00";
-    }
-
+    // Logic to convert selection to database DATETIME format
+    $time = ($bookingTime == "Morning (9AM - 12PM)") ? "09:00:00" : "13:00:00";
     $finalDateTime = $bookingDate . " " . $time;
 
-    // 3. INSERT INTO DATABASE (Matches the SQL columns exactly)
-    $sql = "INSERT INTO onsite_appointments 
-    (patient_name, telephone, services, assigned_doctor, date, totalAmount)
-    VALUES
-    ('$userName', '$userPhone', '$services', 'Pending Assignment', '$finalDateTime', '$totalAmount')";
+    // 3. INSERT INTO online_appointments[cite: 7]
+    $sql = "INSERT INTO online_appointments 
+            (patient_name, userEmail, telephone, services, assigned_doctor, date, totalAmount, status)
+            VALUES
+            ('$patient_name', '$userEmail', '$telephone', '$services', 'Pending Assignment', '$finalDateTime', '$totalAmount', 'Pending')";
 
-    $success = $conn->query($sql);
+    if ($conn->query($sql)) {
+        $success = true;
+        // 4. DETECT THE NEWLY GENERATED ID
+        $generated_id = $conn->insert_id; 
+    }
 }
 ?>
 
@@ -42,21 +43,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userName'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booking Confirmed - SynerQi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <link rel="stylesheet" href="../design/style.css">
     <link rel="stylesheet" href="../design/homepage.css">
     <link rel="stylesheet" href="../design/booking.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-    <style>
-        .check-icon { color: #008080; font-size: 80px; margin-bottom: 20px; }
-    </style>
 </head>
 <body>
 
     <header>
         <div class="logo">
-            <a href="../index.php">
-                <img src="../images/synerqi header logo.png" alt="SynerQi Logo">
-            </a>
+            <img src="../images/synerqi header logo.png" alt="SynerQi Logo">
         </div>
         <nav>
             <ul class="nav-links">
@@ -68,34 +65,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userName'])) {
     <div class="thank-you-container">
         <div class="thank-you-card">
             <?php if($success): ?>
-                <span class="material-icons-round check-icon">check_circle</span>
+                <span class="material-icons-round" style="color: #008080; font-size: 80px;">check_circle</span>
                 <h1>Booking Confirmed</h1>
-                <p>We've received your request, <strong><?php echo htmlspecialchars($userName); ?></strong>!</p>
                 
                 <div class="schedule-text">
-                    You are scheduled at <?php echo date("F j, Y", strtotime($bookingDate)); ?> at <?php echo htmlspecialchars($bookingTime); ?>
+                    Reference Number: <br>
+                    <span style="font-size: 1.5rem; color: #008080;">SYNERQI-<?php echo str_pad($generated_id, 4, '0', STR_PAD_LEFT); ?></span>
                 </div>
 
+                <p>We've received your request, <strong><?php echo htmlspecialchars($patient_name); ?></strong>!</p>
+                
                 <table class="transaction-table">
-                    <thead>
-                        <tr><th colspan="2">Transaction Details</th></tr>
-                    </thead>
+                    <thead><tr><th colspan="2">Transaction Details</th></tr></thead>
                     <tbody>
-                        <tr><td>Name</td><td><?php echo htmlspecialchars($userName); ?></td></tr>
                         <tr><td>Email</td><td><?php echo htmlspecialchars($userEmail); ?></td></tr>
-                        <tr><td>Services</td><td><?php echo htmlspecialchars($services); ?></td></tr>
-                        <tr><td>Phone</td><td><?php echo htmlspecialchars($userPhone); ?></td></tr>
+                        <tr><td>Phone</td><td><?php echo htmlspecialchars($telephone); ?></td></tr>
+                        <tr><td>Schedule</td><td><?php echo date("M d, Y", strtotime($bookingDate)); ?> (<?php echo $bookingTime; ?>)</td></tr>
                         <tr class="total-row"><td>Total Due</td><td>₱<?php echo number_format($totalAmount); ?></td></tr>
                     </tbody>
                 </table>
-            <?php else: ?>
-                <span class="material-icons-round check-icon" style="color: #ff5252;">error</span>
-                <h1>Something went wrong</h1>
-                <p>We couldn't process your booking. Please try again.</p>
-            <?php endif; ?>
+                
+                <a href="index.php" class="btn-return-home">Return to Home</a>
 
-            <br>
-            <a href="index.php" class="btn-return-home">Return to Home</a>
+            <?php else: ?>
+                <span class="material-icons-round" style="color: #ff5252; font-size: 80px;">error</span>
+                <h1>Booking Failed</h1>
+                <p>There was an error processing your appointment. Please try again.</p>
+                <a href="../index.php" class="btn-return-home">Try Again</a>
+            <?php endif; ?>
         </div>
     </div>
 
