@@ -299,6 +299,17 @@ if (isset($_SESSION['admin_logged_in'])) {
                         </div>
                     </div>
 
+                    <!--DASHBOARD ANALYTICS -->
+
+
+
+
+
+
+
+
+                    <!-- END HERE -->
+
                 <?php elseif ($current_page === 'online'): ?>
                     
                     <?php
