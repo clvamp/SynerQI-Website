@@ -20,11 +20,11 @@
         
         <nav id="mainNav">
             <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="services.html">Treatments</a></li>
-                <li><a href="contact.html">Contact</a></li>
-                <li><a href="appointmentstatus.html">Status</a></li>
+                <li><a href="index.php">Home</a></li>
+                <li><a href="about.php">About</a></li>
+                <li><a href="services.php">Treatments</a></li>
+                <li><a href="contact.php">Contact</a></li>
+                <li><a href="appointmentstatus.php">Status</a></li>
             </ul>
         </nav>
         
@@ -48,7 +48,7 @@
                     
                     <div class="hero-actions">
                         <button class="btn btn-primary pulse-anim" onclick="openGeneralModal()">Book Appointment</button>
-                        <a href="services.html" class="btn btn-secondary">Explore Treatments</a>
+                        <a href="services.php" class="btn btn-secondary">Explore Treatments</a>
                     </div>
                 </div>
             </div>
@@ -185,11 +185,11 @@
             <div class="footer-column">
                 <h4>Quick Links</h4>
                 <ul class="footer-links">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="about.html">About Us</a></li>
-                    <li><a href="services.html">Treatments</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                    <li><a href="appointmentstatus.html">Status</a></li>
+                    <li><a href="index.php">Home</a></li>
+                    <li><a href="about.php">About Us</a></li>
+                    <li><a href="services.php">Treatments</a></li>
+                    <li><a href="contact.php">Contact</a></li>
+                    <li><a href="appointmentstatus.php">Status</a></li>
                 </ul>
             </div>
 
@@ -203,7 +203,7 @@
                     <a href="tel:+639950461097" style="color: white; font-weight: 600;">0995 046 1097</a>
                 </p>
                 <p>
-                    <a href="contact.html" style="text-decoration: underline; color: #008080;">See full contact details →</a>
+                    <a href="contact.php" style="text-decoration: underline; color: #008080;">See full contact details →</a>
                 </p>
             </div>
 
@@ -259,7 +259,7 @@
                         <span class="material-icons-round close-btn-desktop" onclick="closeModal()">close</span>
                     </div>
 
-                    <form id="modalBookingForm" action="database/process_booking.html" method="POST">
+                    <form id="modalBookingForm" action="database/process_booking.php" method="POST">
 
                         <div class="form-group">
                             <label>Treatments</label>
@@ -384,7 +384,7 @@
                                     <h4>4. Patient Conduct</h4>
                                     <p>We maintain a respectful and safe clinical environment. Service may be refused if behavior disrupts patient care or clinic operations.</p>
                                 
-                                    <button type="button" class="terms-trigger-btn nav-style-button" onclick="window.location.href='about.html#terms'">
+                                    <button type="button" class="terms-trigger-btn nav-style-button" onclick="window.location.href='about.php#terms'">
                                         See Full Details
                                     </button>
                                 </div>
