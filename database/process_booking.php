@@ -106,7 +106,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userName'])) {
                     </tbody>
                 </table>
                 
-                <a href="../index.php" class="btn-return-home">Return to Home</a>
+                <div class="button-group">
+                    <a href="../appointmentstatus.php" class="btn-status">Check Status</a>
+                    <a href="../index.php" class="btn-return-home">Return to Home</a>
+                </div>
 
             <?php else: ?>
                 <span class="material-icons-round" style="color: #ff5252; font-size: 80px;">error</span>
