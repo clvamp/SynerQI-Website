@@ -126,6 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reference_number'])) 
                     <li><a href="about.php">About Us</a></li>
                     <li><a href="services.php">Treatments</a></li>
                     <li><a href="contact.php">Contact</a></li>
+                    <li><a href="appointmentstatus.php">Status</a></li>
                 </ul>
             </div>
 
@@ -158,6 +159,188 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reference_number'])) 
     <button id="scrollToTopBtn" title="Go to top">
         <span class="material-icons-round">arrow_upward</span>
     </button>
+
+    <!-- CTA BUTTON POP UP FORM -->
+    <div id="bookingModal" class="modal-overlay">
+        <div class="modal-wrapper">
+            <div class="mobile-modal-header">
+                <h4>Complete Request</h4>
+                <span class="material-icons-round close-btn-mobile" onclick="closeModal()">close</span>
+            </div>
+
+            <div class="modal-grid">
+
+                <!-- LEFT -->
+                <div class="modal-context-info">
+                    <div class="info-label">Current Total</div>
+                    <p class="info-value" id="cartTotal">₱0</p>
+
+                    <div class="info-divider"></div>
+
+                    <div class="info-label">Chosen Treatments</div>
+                    <p id="servicesComma" class="info-value-small mobile-only">No services selected</p>
+                    <div class="desktop-only">
+                        <details id="servicesDropdown" open>
+                            <summary>Selected List</summary>
+                            <ul id="servicesList">
+                                <li class="no-services">No services selected</li>
+                            </ul>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- CENTER (FORM) -->
+                <div class="modal-form-section">
+                    <div class="form-header-desktop">
+                        <h3>Complete Request</h3>
+                        <span class="material-icons-round close-btn-desktop" onclick="closeModal()">close</span>
+                    </div>
+
+                    <form id="modalBookingForm" action="database/process_booking.php" method="POST">
+
+                        <div class="form-group">
+                            <label>Treatments</label>
+                            <div class="custom-select-wrapper">
+                                <div class="select-box-trigger" id="serviceToggleButton">
+                                    <span id="selectedServicesText">Select Treatments</span>
+                                    <span class="material-icons-round">expand_more</span>
+                                </div>
+
+                                <div id="servicesSelectionOverlay" class="services-dropdown-content">
+                                    <div class="checkbox-list">
+                                        <label class="check-item">
+                                            <input type="checkbox" class="service-check" value="Consultation" data-price="1000">
+                                            <span>Consultation - ₱1,000</span>
+                                        </label>
+                                        <label class="check-item">
+                                            <input type="checkbox" class="service-check" value="Acupuncture" data-price="1500">
+                                            <span>Acupuncture - ₱1,500</span>
+                                        </label>
+                                        <label class="check-item">
+                                            <input type="checkbox" class="service-check" value="Herbal Remedies" data-price="300">
+                                            <span>Herbal Remedies - ₱300</span>
+                                        </label>
+                                        <label class="check-item">
+                                            <input type="checkbox" class="service-check" value="Cupping" data-price="1200">
+                                            <span>Cupping - ₱1,200</span>
+                                        </label>
+                                        <label class="check-item">
+                                            <input type="checkbox" class="service-check" value="Tuina" data-price="1000">
+                                            <span>Tuina - ₱1,000</span>
+                                        </label>
+                                        <label class="check-item">
+                                            <input type="checkbox" class="service-check" value="Guasha" data-price="1200">
+                                            <span>Guasha - ₱1,200</span>
+                                        </label>
+                                        <label class="check-item">
+                                            <input type="checkbox" class="service-check" value="Rehabilitation" data-price="1000">
+                                            <span>Rehabilitation - ₱1,000</span>
+                                        </label>
+                                        <label class="check-item">
+                                            <input type="checkbox" class="service-check" value="Physical Exercise" data-price="800">
+                                            <span>Physical Exercise - ₱800</span>
+                                        </label>
+                                        <label class="check-item">
+                                            <input type="checkbox" class="service-check" value="3D Acu & Myofascial" data-price="4000">
+                                            <span>3D Acu & Myofascial - ₱4,000</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="userName" placeholder="Enter your name" required name="userName">
+                        </div>
+
+                        <!-- Mobile only -->
+                        <div class="mobile-only">
+                            <div class="form-group">
+                                <label>Patient Vitals</label>
+                                <textarea name="patient_vitals_mob" placeholder="BP, Temp, etc..." rows="2"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Patient Concern</label>
+                                <textarea name="patient_concern_mob" placeholder="Symptoms..." rows="2"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="userEmail" placeholder="email@example.com" required name="userEmail">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="tel" id="userPhone" placeholder="0912 345 6789" required name="userPhone">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Date</label>
+                                <input type="date" id="bookingDate" required name="date">
+                            </div>
+                            <div class="form-group">
+                                <label>Time</label>
+                                <select id="bookingTime" name="bookingTime">
+                                    <option>Morning (9AM - 12PM)</option>
+                                    <option>Afternoon (1PM - 5PM)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="terms-container">
+                            <div class="terms-row">
+                                <label class="terms-check-wrapper">
+                                    <input type="checkbox" id="termsCheck" name="terms_agreed" required>
+                                    <span class="terms-text">I have read the</span>
+                                </label>
+                                <button type="button" class="terms-trigger-btn" onclick="openLegalModal()">
+                                    Terms and Services
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-request-btn">
+                            Confirm Request
+                        </button>
+
+                        <input type="hidden" name="totalAmount" id="totalAmountInput" value="0">
+                        <input type="hidden" name="selectedServicesList" id="servicesListInput" value="">
+                    </form>
+                </div>
+
+                <!-- RIGHT (CORRECT POSITION NOW) -->
+                <div class="modal-patient-notes desktop-only">
+
+                    <div class="notes-group">
+                        <label>Patient Vitals</label>
+                        <textarea 
+                            name="patient_vitals"
+                            id="patientVitals"
+                            form="modalBookingForm"
+                            placeholder="Blood Pressure, Heart Rate, Temperature..."
+                            required
+                        ></textarea>
+                    </div>
+
+                    <div class="notes-group">
+                        <label>Patient Concern</label>
+                        <textarea 
+                            name="patient_concern"
+                            id="patientConcern"
+                            form="modalBookingForm"
+                            placeholder="Describe symptoms, pain, concerns..."
+                            required
+                        ></textarea>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
 
     <script src="script/bookapp.js" type="text/javascript"></script>
     <script src="script/navbar.js" type="text/javascript"></script>
