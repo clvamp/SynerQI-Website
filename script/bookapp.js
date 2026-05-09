@@ -1,188 +1,906 @@
-document.addEventListener('DOMContentLoaded', function() {
+/* ==========================================================================
+   CTA BOOKING MODAL - ADJUSTED EXACTLY FOR YOUR HTML STRUCTURE
+   ========================================================================== */
 
-    // --- 1. DATE LIMITER ---
-    const dateInput = document.getElementById('bookingDate');
-    if (dateInput) {
-        const today = new Date();
-        const nextWeek = new Date(today);
-        nextWeek.setDate(today.getDate() + 7);
-        
-        const offset = today.getTimezoneOffset() * 60000;
-        const localToday = new Date(today - offset).toISOString().split('T')[0];
-        const localNextWeek = new Date(nextWeek - offset).toISOString().split('T')[0];
-        
-        dateInput.setAttribute('min', localToday);
-        dateInput.setAttribute('max', localNextWeek);
-    }
+/* OVERLAY */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
 
-    // --- DROPDOWN TOGGLE FOR TREATMENTS ---
-    const trigger = document.getElementById('serviceToggleButton');
-    const dropdown = document.getElementById('servicesSelectionOverlay');
-    const wrapper = document.querySelector('.custom-select-wrapper');
+    width: 100vw;
+    height: 100vh;
 
-    if (trigger) {
-        trigger.addEventListener('click', function(e) {
-            e.stopPropagation();
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(8px);
 
-            dropdown.classList.toggle('active');
-            wrapper.classList.toggle('is-open');
-        });
-    }
-    
+    z-index: 9999;
 
-// --- Updated UI Logic ---
-function updateAllDisplays() {
-    let total = 0;
-    let selectedNames = [];
+    justify-content: center;
+    align-items: center;
 
-    document.querySelectorAll('.service-check:checked').forEach(checkedBox => {
-        total += parseInt(checkedBox.getAttribute('data-price')) || 0;
-        selectedNames.push(checkedBox.value);
-    });
+    padding: 20px;
+    box-sizing: border-box;
 
-    // Update the trigger box text
-    const triggerText = document.getElementById('selectedServicesText');
-    if (selectedNames.length > 0) {
-        triggerText.innerText = selectedNames.join(", ");
-        triggerText.style.color = "#008080"; // Change color when selected
-    } else {
-        triggerText.innerText = "Select Treatments";
-        triggerText.style.color = "#333";
-    }
-
-    // Update your existing price/hidden inputs logic below...
-    const formattedTotal = "₱" + total.toLocaleString();
-    if (document.getElementById('cartTotal')) cartTotal.innerText = formattedTotal;
-    if (document.getElementById('totalAmountInput')) totalAmountInput.value = total;
+    overflow-y: auto;
 }
 
-// Logic to close dropdown when clicking outside
-window.addEventListener('click', function(e) {
-    const dropdown = document.getElementById('servicesSelectionOverlay');
-    const trigger = document.getElementById('serviceToggleButton');
-    const wrapper = document.querySelector('.custom-select-wrapper');
-
-    if (!trigger.contains(e.target) && !dropdown.contains(e.target)) {
-        dropdown.classList.remove('active');
-        wrapper.classList.remove('is-open');
-    }
-});
-
-    // --- 3. CONSOLIDATED CALCULATION LOGIC ---
-    const checkboxes = document.querySelectorAll('.service-check');
-    
-    // UI Display elements
-    const cartTotal = document.getElementById('cartTotal');
-    const selectedList = document.getElementById('selectedList');
-    const totalPaymentDisplay = document.getElementById('modalTotalPayment');
-    const servicesListDisplay = document.getElementById('modalServicesList');
-
-    // HIDDEN INPUTS (These send data to process_booking.php)
-    const totalAmountInput = document.getElementById('totalAmountInput');
-    const servicesListInput = document.getElementById('servicesListInput');
-
-    // --- Updated UI Logic ---
-function updateAllDisplays() {
-    let total = 0;
-    let selectedNames = [];
-
-    // 1. Gather data
-    document.querySelectorAll('.service-check:checked').forEach(checkedBox => {
-        total += parseInt(checkedBox.getAttribute('data-price')) || 0;
-        selectedNames.push(checkedBox.value);
-    });
-
-    // 2. Update Total Payment
-    const cartTotal = document.getElementById('cartTotal');
-    if (cartTotal) cartTotal.innerText = "₱" + total.toLocaleString();
-
-    // 3. Conditional Formatting Logic
-    const isMobile = window.innerWidth <= 768;
-
-    if (isMobile) {
-        const commaDisplay = document.getElementById('servicesComma');
-        if (commaDisplay) {
-            commaDisplay.innerText = selectedNames.length > 0 ? selectedNames.join(", ") : "No services selected";
-        }
-    } else {
-        const listDisplay = document.getElementById('servicesList');
-        const detailsElement = document.getElementById('servicesDropdown');
-        
-        if (listDisplay) {
-            if (selectedNames.length > 0) {
-                listDisplay.innerHTML = selectedNames.map(name => `<li>${name}</li>`).join("");
-                if (detailsElement) detailsElement.setAttribute('open', ''); // Keep shown
-            } else {
-                listDisplay.innerHTML = '<li class="no-services">No services selected</li>';
-            }
-        }
-    }
-
-    // 4. Update hidden inputs for PHP form submission
-    const totalInput = document.getElementById('totalAmountInput');
-    const servicesInput = document.getElementById('servicesListInput');
-    if (totalInput) totalInput.value = total;
-    if (servicesInput) servicesInput.value = selectedNames.join(", ");
+.modal-overlay.active {
+    display: flex;
 }
-    checkboxes.forEach(box => {
-        box.addEventListener('change', updateAllDisplays);
-    });
 
-    updateAllDisplays();
-});
+/* WRAPPER */
+.modal-wrapper {
+    width: auto !important;
+    max-width: none !important;
 
-// --- Terms & Services Modal Logic ---
-window.openLegalModal = function() {
-    const legalModal = document.getElementById('legalModal');
-    if (legalModal) {
-        legalModal.classList.add('active');
-        document.body.style.overflow = 'hidden'; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 0;
+    margin: 0;
+}
+
+/* ==========================================================================
+   MOBILE HEADER
+   ========================================================================== */
+.mobile-modal-header {
+    display: none;
+}
+
+/* ==========================================================================
+   MAIN 3 PANEL GRID
+   ========================================================================== */
+.modal-grid {
+    display: grid;
+
+    /* Left is fixed, Right is fixed, Center fills the rest */
+    grid-template-columns: 270px 680px 350px;
+
+    width: 95vw;
+    max-width: 1300px;
+    height: 88vh;
+    max-height: 950px;
+    background: #ffffff;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   LEFT PANEL
+   ========================================================================== */
+.modal-context-info {
+    background: linear-gradient(180deg, #c4e1e1 0%, #d7ecec 100%);
+    padding: 50px 20px;
+
+    display: flex;
+    flex-direction: column;
+
+    border-right: 1px solid rgba(0,0,0,0.05);
+
+    overflow-y: auto;
+
+    min-width: 0;
+    min-height: 0;
+
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   CENTER PANEL
+   ========================================================================== */
+.modal-form-section {
+    background: #ffffff;
+    padding: 40px;
+
+    overflow-y: auto;
+
+    min-width: 0;
+    min-height: 0;
+
+    width: 100%;
+
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   RIGHT PANEL
+   ========================================================================== */
+.modal-patient-notes {
+    background: #f9fbfb;
+    padding: 50px 20px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    border-left: 1px solid #e5e7eb;
+
+    overflow-y: auto;
+
+    min-width: 0;
+    min-height: 0;
+
+    width: 100%;
+
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   FORM HEADER
+   ========================================================================== */
+.form-header-desktop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+
+    border-bottom: 1px solid #eee;
+}
+
+.close-btn-desktop {
+    cursor: pointer;
+    color: #999;
+    padding: 8px;
+    border-radius: 50%;
+
+    transition: all 0.3s ease;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn-desktop:hover {
+    background: #f0f8f8;
+    color: #008080;
+    transform: rotate(90deg);
+}
+
+/* ==========================================================================
+   FORM STRUCTURE
+   ========================================================================== */
+#modalBookingForm {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* DATE + TIME */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* ==========================================================================
+   LEFT PANEL INFO
+   ========================================================================== */
+.info-label {
+    color: #666;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+    margin-top: 15px;
+    font-weight: 600;
+}
+
+.info-value {
+    color: #008080;
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.info-value-small {
+    color: #333;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.6;
+    margin-top: 5px;
+    flex-grow: 1;
+}
+
+.info-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.85);
+    margin: 15px 0;
+    width: 100%;
+}
+
+/* SERVICES LIST */
+#servicesList {
+    margin-top: 10px;
+    padding-left: 0;
+    list-style: none;
+}
+
+#servicesList li {
+    font-size: 0.85rem;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.7);
+    color: #444;
+}
+
+.no-services {
+    color: #999 !important;
+    border-bottom: none !important;
+}
+
+/* ==========================================================================
+   RIGHT PANEL NOTES
+   ========================================================================== */
+.notes-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.notes-group label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #0f766e;
+
+    margin-bottom: 10px;
+
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.notes-group textarea {
+    width: 100%;
+    max-width: 100%;
+
+    min-height: 220px;
+
+    resize: vertical;
+
+    padding: 16px;
+
+    border-radius: 14px;
+    border: 1.5px solid #d1d5db;
+
+    background: #ffffff;
+
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    color: #374151;
+    line-height: 1.6;
+
+    box-sizing: border-box;
+
+    transition: all 0.25s ease;
+}
+
+.notes-group textarea:focus {
+    outline: none;
+    border-color: #008080;
+    box-shadow: 0 0 0 4px rgba(0,128,128,0.10);
+}
+
+/* ==========================================================================
+   BUTTON
+   ========================================================================== */
+.submit-request-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 20px;
+
+    background-color: #006666;
+    color: #ffffff;
+
+    border: none;
+    border-radius: 10px;
+
+    font-size: 1rem;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-request-btn:hover {
+    background-color: #008080;
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   SCROLLBAR
+   ========================================================================== */
+.modal-context-info::-webkit-scrollbar,
+.modal-form-section::-webkit-scrollbar,
+.modal-patient-notes::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-context-info::-webkit-scrollbar-thumb,
+.modal-form-section::-webkit-scrollbar-thumb,
+.modal-patient-notes::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+}
+
+/* ==========================================================================
+   3. CUSTOM SELECTION DROPDOWN (Treatments Select)
+   ========================================================================== */
+.custom-select-wrapper {
+    position: relative;
+    width: 100%;
+}
+.select-box-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px;
+    background: #ffffff;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.select-box-trigger:hover {
+    border-color: #008080;
+    box-shadow: 0 4px 12px rgba(0, 128, 128, 0.05);
+}
+.select-box-trigger .material-icons-round {
+    color: #999;
+    transition: transform 0.3s ease;
+}
+.custom-select-wrapper.is-open .select-box-trigger {
+    border-color: #008080;
+    box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.1);
+}
+.custom-select-wrapper.is-open .material-icons-round {
+    transform: rotate(180deg);
+}
+.services-dropdown-content {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 100%;
+    background: #ffffff;
+    z-index: 1000;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+    overflow: hidden;
+    animation: slideDown 0.2s ease-out;
+}
+.services-dropdown-content.active { display: block !important; }
+.checkbox-list {
+    max-height: 250px;
+    overflow-y: auto;
+    padding: 8px;
+}
+.check-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 14px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+.check-item:hover { background: #f0f8f8; }
+.check-item span {
+    font-size: 0.92rem;
+    color: #444;
+    font-weight: 500;
+}
+.check-item input[type="checkbox"] {
+    margin-right: 14px;
+    width: 18px;
+    height: 18px;
+    accent-color: #008080;
+}
+
+/* ==========================================================================
+   4. TERMS & LEGAL MODALS
+   ========================================================================== */
+.terms-container {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    gap: 20px;
+    width: 100%;
+}
+.terms-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.terms-trigger-btn {
+    background: none;
+    border: none;
+    padding: 5px 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color:#006666;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: transform 0.3s ease, color 0.3s ease;
+    display: inline-block;
+}
+.terms-trigger-btn:hover {
+    color:#008080;
+    transform: scale(1.1);
+}
+.legal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+.legal-overlay.active { display: flex; }
+.legal-popup {
+    background: #ffffff;
+    width: 90%;
+    max-width: 500px;
+    padding: 35px;
+    border-radius: 15px;
+}
+.legal-body {
+    max-height: 280px;
+    overflow-y: auto;
+    text-align: left;
+}
+.legal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.legal-header h3 {
+    color: #006666;
+    font-size: 1.5rem;
+}
+.legal-header h3 {
+    font-size: 1.2rem;
+}
+.legal-body {
+    max-height: 250px;
+    overflow-y: auto;
+    margin-bottom: 25px;
+}
+/* Close Button */
+.close-legal {
+    cursor: pointer;
+    color: #999;
+    padding: 5px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+.close-legal:hover {
+    background: #f0f8f8;
+    color: #008080;
+    transform: rotate(90deg); 
+}
+/* See Full Details */
+.nav-style-button {
+    background: none;
+    border: none;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #222;
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    /* Centering Logic */
+    display: flex;
+    flex-direction: column; /* Stack text and underline */
+    align-items: center;    /* Center them horizontally */
+    margin: 0 auto;         /* Center the button itself in its container */
+    text-decoration: none;
+    position: relative;     /* Anchor for the underline */
+}
+
+.nav-style-button:hover {
+    color: #008080;
+    background-color: rgba(0, 128, 128, 0.05);
+    border-radius: 8px;
+}
+
+/* Underline Animation */
+.nav-style-button::after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 2px;
+    background: #008080;
+    transition: width 0.3s ease;
+    position: absolute;
+    bottom: 5px; 
+    left: 50%;
+    transform: translateX(-50%);
+}
+.nav-style-button:hover::after {
+    width: 60%; /* Adjust this to control how long the line is under the text */
+}
+/* I Understand */
+.legal-confirm-btn {
+    width: 100%;
+    background:#006666;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block;
+    font-size: 1rem;
+}
+.legal-confirm-btn:hover {
+    width: 100%;
+    background:#008080;
+    font-size: 1.1rem;
+}
+
+/* ==========================================================================
+   5. ACTION BUTTONS
+   ========================================================================== */
+.submit-request-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 20px;
+    background-color: #006666;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+.submit-request-btn:hover {
+    opacity: 0.9;
+    background-color: #008080;
+    font-size: 1.1rem;
+}
+/* ==========================================================================
+   CUSTOM POPUP NOTICE (TEAL & GOLD THEME)
+   ========================================================================== */
+.notice-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(8px);
+    z-index: 10000; /* Higher than the main booking modal */
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.notice-overlay.active {
+    display: flex;
+}
+
+.notice-box {
+    background: #fff;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 12px;
+    border-top: 5px solid #008080; /* Signature Teal */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    animation: noticePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes noticePop {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
     }
-};
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
 
-window.closeLegalModal = function() {
-    const legalModal = document.getElementById('legalModal');
-    if (legalModal) {
-        legalModal.classList.remove('active');
+.notice-header {
+    padding: 24px 24px 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.notice-icon {
+    color: #c5a059; /* Signature Gold */
+    font-size: 2rem !important;
+}
+
+.notice-header h4 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #008080;
+    margin: 0;
+}
+
+.notice-body {
+    padding: 0 24px 20px 24px;
+}
+
+.notice-body p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    color: #4b5563;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.notice-footer {
+    padding: 16px 24px 24px 24px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.notice-btn {
+    font-family: 'Poppins', sans-serif;
+    background: #008080;
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.notice-btn:hover {
+    background: #006666;
+    transform: translateY(-1px);
+}
+
+
+/* ==========================================================================
+   VALIDATION HIGHLIGHT (GLOBAL/DESKTOP)
+   ========================================================================== */
+.terms-container.validation-highlight {
+    border: 1.5px solid #ef4444; /* Red border */
+    border-radius: 8px;
+    padding: 8px;
+    background-color: #fef2f2; /* Light red background tint */
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+    animation: shake-highlight 0.4s ease-in-out;
+    transition: all 0.3s ease;
+}
+
+/* Eye-catching shake animation for Desktop */
+@keyframes shake-highlight {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+}
+
+
+/* ==========================================================================
+   RESPONSIVE TABLET + MOBILE
+   ========================================================================== */
+@media (max-width: 1024px) {
+    /* 1. Prevent the whole modal from scrolling - we scroll internal sections instead */
+    .modal-overlay {
+        overflow: hidden;
+        padding: 0;
+    }
+
+    .modal-wrapper {
+        width: 90vw !important;
+        height: 100vh !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
+    .modal-grid {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        grid-template-columns: 1fr; /* Override grid */
+        overflow: hidden;
+    }
+
+    /* 2. FIX THE HEADER (HIDE THE DESKTOP ONE) */
+    .mobile-modal-header {
+        display: flex !important;
+        justify-content: space-between; /* This creates the gap between title and X */
+        align-items: center;
         
-        // Re-enable scroll only if the main booking modal is also closed
-        const bookingModal = document.getElementById('bookingModal');
-        if (!bookingModal || !bookingModal.classList.contains('active')) {
-            document.body.style.overflow = 'auto';
-        }
+        padding: 20px 24px; /* Vertical gap of 20px, Horizontal gap of 24px */
+        background: #ffffff;
+        border-bottom: 1px solid #f1f5f9;
+        
+        flex-shrink: 0; /* Keeps it fixed at the top */
+        width: 100%;
+        box-sizing: border-box;
     }
-};
 
-// Close when clicking the dark area
-window.addEventListener('click', function(e) {
-    const legalModal = document.getElementById('legalModal');
-    if (e.target === legalModal) {
-        closeLegalModal();
+    .mobile-modal-header h4 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
     }
-});
 
-// Final Validation on Submit
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('modalBookingForm');
-    const check = document.getElementById('termsCheck');
-
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            if (check && !check.checked) {
-                e.preventDefault();
-                alert("Please agree to the Terms and Services to continue.");
-            }
-        });
+    .close-btn-mobile {
+        font-size: 24px;
+        color: #64748b;
+        cursor: pointer;
+        padding: 4px; /* Makes the click area larger */
     }
-});
 
-// CTA
-document.getElementById("modalBookingForm").addEventListener("submit", function(e) {
-    const vitals = document.getElementById("patientVitals").value.trim();
-    const concern = document.getElementById("patientConcern").value.trim();
-
-    if (!vitals || !concern) {
-        e.preventDefault();
-        alert("Please fill in Patient Vitals and Patient Concern.");
+    .form-header-desktop {
+        display: none !important; /* Removes the 2nd header */
     }
-});
+
+    /* 3. THE FIXED TOP PANEL (Your specific design applied) */
+    .modal-context-info {
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0; /* Ensures it does NOT scroll */
+        
+        background: linear-gradient(180deg, #c4e1e1 0%, #d7ecec 100%);
+        padding: 30px 20px; /* Adjusted for mobile space */
+        text-align: center;
+        align-items: center;
+        
+        border-right: none;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        overflow-y: visible; /* Since it's fixed, we don't want internal scroll here */
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* 4. THE SCROLLABLE MAIN SECTION */
+    .modal-form-section {
+        flex-grow: 1; /* Fills remaining space */
+        overflow-y: auto; /* THIS part scrolls */
+        padding: 20px 25px 100px 25px; /* Bottom padding for submit button */
+        background: white;
+    }
+
+    /* Hide the 3rd panel completely */
+    .modal-patient-notes {
+        display: none !important;
+    }
+
+    /* 5. PATIENT VITALS MOBILE CSS */
+    .mobile-only {
+        display: block !important;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .mobile-only textarea {
+        width: 100%;
+        min-height: 110px;
+        padding: 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+        font-family: inherit;
+        background: #fdfdfd;
+        margin-top: 5px;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    /* 6. MOBILE TERMS HIGHLIGHT ADJUSTMENTS */
+    .terms-container.validation-highlight {
+        border-width: 1px; /* Thinner border for small screens */
+        padding: 6px;      /* Slightly tighter padding */
+        box-shadow: 0 0 6px rgba(239, 68, 68, 0.15); /* Softer glow */
+        animation: shake-highlight-mobile 0.4s ease-in-out; /* Gentler shake */
+    }
+
+    /* Gentler shake animation so it doesn't cause browser horizontal shifting on small viewports */
+    @keyframes shake-highlight-mobile {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-3px); }
+        75% { transform: translateX(3px); }
+    }
+}
+
+/* On very small phones, you can switch to a single column if it gets too tight */
+@media (max-width: 600px) {
+    .modal-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================================================
+   DESKTOP ONLY / MOBILE ONLY
+   ========================================================================== */
+@media (min-width: 769px) {
+    .mobile-only {
+        display: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .desktop-only {
+        display: none !important;
+    }
+}
+
+
+
+/* ==========================================================================
+   ABOUT PAGE LEGAL SECTION (ISOLATED)
+   ========================================================================== */
+
+.about-legal-header {
+    display: flex;
+    flex-direction: column; /* This forces the vertical stack */
+    align-items: center;    /* Centers everything horizontally */
+    text-align: center;
+    margin-bottom: 50px;    /* Space before the content starts */
+}
+
+/* "Legal Framework" Label */
+.about-legal-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #c5a059; /* Your signature Gold */
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: block;
+}
+
+/* "Terms of Service..." Title */
+.about-legal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem; /* Larger for the full page view */
+    color: #008080;    /* Your signature Teal */
+    margin: 0 0 25px 0;
+    line-height: 1.2;
+}
+
+/* The Info Divider Line */
+.about-legal-divider {
+    height: 3px;
+    width: 120px;
+    /* 30% Teal accent, 70% light grey line */
+    background:#c5a059;
+    margin: 0 auto; /* Keeps the line centered */
+}
+
+/* Legal Content */
+.legal-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.legal-block h3 {
+    color: #008080;
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+}
