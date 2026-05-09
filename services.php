@@ -428,11 +428,11 @@
                         <div class="mobile-only">
                             <div class="form-group">
                                 <label>Patient Vitals</label>
-                                <textarea name="patient_vitals_mob" placeholder="BP, Temp, etc..." rows="2"></textarea>
+                                <textarea name="patient_vitals" placeholder="BP, Temp, etc..." rows="2"></textarea>
                             </div>
                             <div class="form-group">
                                 <label>Patient Concern</label>
-                                <textarea name="patient_concern_mob" placeholder="Symptoms..." rows="2"></textarea>
+                                <textarea name="patient_concern" placeholder="Symptoms..." rows="2"></textarea>
                             </div>
                         </div>
 
@@ -472,6 +472,33 @@
                             </div>
                         </div>
 
+			            <div id="legalModal" class="legal-overlay">
+                            <div class="legal-popup">
+                                <div class="legal-header">
+                                    <h3>Terms & Services</h3>
+                                    <span class="material-icons-round close-legal" onclick="closeLegalModal()">close</span>
+                                </div>
+                                <div class="legal-body">
+                                    <h4>1. Medical Disclaimer</h4>
+                                    <p>Information from SynerQi is for general guidance only and does not replace professional medical advice. Always consult our certified physicians for diagnosis or treatment.</p>
+                                    
+                                    <h4>2. Data Privacy</h4>
+                                    <p>Your personal and health information is kept secure and handled according to health privacy regulations.</p>
+                                    
+                                    <h4>3. Cancellation</h4>
+                                    <p>Please provide accurate information when booking and give at least 24 hours notice if you need to cancel or reschedule.</p>
+                                
+                                    <h4>4. Patient Conduct</h4>
+                                    <p>We maintain a respectful and safe clinical environment. Service may be refused if behavior disrupts patient care or clinic operations.</p>
+                                
+                                    <button type="button" class="terms-trigger-btn nav-style-button" onclick="window.location.href='about.php#terms'">
+                                        See Full Details
+                                    </button>
+                                </div>
+                                <button type="button" class="legal-confirm-btn" onclick="closeLegalModal()">I Understand</button>
+                            </div>
+                        </div>
+
                         <button type="submit" class="submit-request-btn">
                             Confirm Request
                         </button>
@@ -491,7 +518,6 @@
                             id="patientVitals"
                             form="modalBookingForm"
                             placeholder="Blood Pressure, Heart Rate, Temperature..."
-                            required
                         ></textarea>
                     </div>
 
@@ -502,12 +528,26 @@
                             id="patientConcern"
                             form="modalBookingForm"
                             placeholder="Describe symptoms, pain, concerns..."
-                            required
                         ></textarea>
                     </div>
 
                 </div>
 
+            </div>
+        </div>
+    </div>
+
+    <div id="validationNoticeModal" class="notice-overlay">
+        <div class="notice-box">
+            <div class="notice-header">
+                <span class="material-icons-round notice-icon">assignment_late</span>
+                <h4 id="noticeTitle">Information Required</h4>
+            </div>
+            <div class="notice-body">
+                <p id="noticeMessage">Please fill out the missing medical details before proceeding.</p>
+            </div>
+            <div class="notice-footer">
+                <button type="button" id="noticeConfirmBtn" class="notice-btn">Go to Field</button>
             </div>
         </div>
     </div>
