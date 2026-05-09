@@ -576,6 +576,129 @@
     background-color: #008080;
     font-size: 1.1rem;
 }
+/* ==========================================================================
+   CUSTOM POPUP NOTICE (TEAL & GOLD THEME)
+   ========================================================================== */
+.notice-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(8px);
+    z-index: 10000; /* Higher than the main booking modal */
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.notice-overlay.active {
+    display: flex;
+}
+
+.notice-box {
+    background: #fff;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 12px;
+    border-top: 5px solid #008080; /* Signature Teal */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    animation: noticePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes noticePop {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.notice-header {
+    padding: 24px 24px 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.notice-icon {
+    color: #c5a059; /* Signature Gold */
+    font-size: 2rem !important;
+}
+
+.notice-header h4 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #008080;
+    margin: 0;
+}
+
+.notice-body {
+    padding: 0 24px 20px 24px;
+}
+
+.notice-body p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    color: #4b5563;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.notice-footer {
+    padding: 16px 24px 24px 24px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.notice-btn {
+    font-family: 'Poppins', sans-serif;
+    background: #008080;
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.notice-btn:hover {
+    background: #006666;
+    transform: translateY(-1px);
+}
+
+
+/* ==========================================================================
+   VALIDATION HIGHLIGHT (GLOBAL/DESKTOP)
+   ========================================================================== */
+.terms-container.validation-highlight {
+    border: 1.5px solid #ef4444; /* Red border */
+    border-radius: 8px;
+    padding: 8px;
+    background-color: #fef2f2; /* Light red background tint */
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+    animation: shake-highlight 0.4s ease-in-out;
+    transition: all 0.3s ease;
+}
+
+/* Eye-catching shake animation for Desktop */
+@keyframes shake-highlight {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+}
+
 
 /* ==========================================================================
    RESPONSIVE TABLET + MOBILE
@@ -686,6 +809,21 @@
         margin-top: 5px;
         box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
     }
+
+    /* 6. MOBILE TERMS HIGHLIGHT ADJUSTMENTS */
+    .terms-container.validation-highlight {
+        border-width: 1px; /* Thinner border for small screens */
+        padding: 6px;      /* Slightly tighter padding */
+        box-shadow: 0 0 6px rgba(239, 68, 68, 0.15); /* Softer glow */
+        animation: shake-highlight-mobile 0.4s ease-in-out; /* Gentler shake */
+    }
+
+    /* Gentler shake animation so it doesn't cause browser horizontal shifting on small viewports */
+    @keyframes shake-highlight-mobile {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-3px); }
+        75% { transform: translateX(3px); }
+    }
 }
 
 /* On very small phones, you can switch to a single column if it gets too tight */
@@ -766,4 +904,3 @@
     margin-bottom: 15px;
     font-size: 1.3rem;
 }
-
