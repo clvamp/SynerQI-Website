@@ -175,3 +175,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// CTA
+document.getElementById("modalBookingForm").addEventListener("submit", function(e) {
+    const vitals = document.getElementById("patientVitals").value.trim();
+    const concern = document.getElementById("patientConcern").value.trim();
+
+    if (!vitals || !concern) {
+        e.preventDefault();
+        alert("Please fill in Patient Vitals and Patient Concern.");
+    }
+});
