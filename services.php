@@ -296,6 +296,7 @@
                     <li><a href="about.php">About Us</a></li>
                     <li><a href="services.php">Treatments</a></li>
                     <li><a href="contact.php">Contact</a></li>
+                    <li><a href="appointmentstatus.php">Status</a></li>
                 </ul>
             </div>
 
@@ -329,13 +330,17 @@
         <span class="material-icons-round">arrow_upward</span>
     </button>
     
+    <!-- CTA BUTTON POP UP FORM -->
     <div id="bookingModal" class="modal-overlay">
         <div class="modal-wrapper">
             <div class="mobile-modal-header">
                 <h4>Complete Request</h4>
                 <span class="material-icons-round close-btn-mobile" onclick="closeModal()">close</span>
             </div>
+
             <div class="modal-grid">
+
+                <!-- LEFT -->
                 <div class="modal-context-info">
                     <div class="info-label">Current Total</div>
                     <p class="info-value" id="cartTotal">₱0</p>
@@ -353,13 +358,16 @@
                         </details>
                     </div>
                 </div>
-                
+
+                <!-- CENTER (FORM) -->
                 <div class="modal-form-section">
                     <div class="form-header-desktop">
                         <h3>Complete Request</h3>
                         <span class="material-icons-round close-btn-desktop" onclick="closeModal()">close</span>
                     </div>
+
                     <form id="modalBookingForm" action="database/process_booking.php" method="POST">
+
                         <div class="form-group">
                             <label>Treatments</label>
                             <div class="custom-select-wrapper">
@@ -415,14 +423,29 @@
                             <label>Full Name</label>
                             <input type="text" id="userName" placeholder="Enter your name" required name="userName">
                         </div>
+
+                        <!-- Mobile only -->
+                        <div class="mobile-only">
+                            <div class="form-group">
+                                <label>Patient Vitals</label>
+                                <textarea name="patient_vitals_mob" placeholder="BP, Temp, etc..." rows="2"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Patient Concern</label>
+                                <textarea name="patient_concern_mob" placeholder="Symptoms..." rows="2"></textarea>
+                            </div>
+                        </div>
+
                         <div class="form-group">
                             <label>Email Address</label>
                             <input type="email" id="userEmail" placeholder="email@example.com" required name="userEmail">
                         </div>
+
                         <div class="form-group">
                             <label>Phone Number</label>
                             <input type="tel" id="userPhone" placeholder="0912 345 6789" required name="userPhone">
                         </div>
+
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Date</label>
@@ -449,40 +472,42 @@
                             </div>
                         </div>
 
-                        <div id="legalModal" class="legal-overlay">
-                            <div class="legal-popup">
-                                <div class="legal-header">
-                                    <h3>Terms & Services</h3>
-                                    <span class="material-icons-round close-legal" onclick="closeLegalModal()">close</span>
-                                </div>
-                                <div class="legal-body">
-                                    <h4>1. Medical Disclaimer</h4>
-                                    <p>Information from SynerQi is for general guidance only and does not replace professional medical advice. Always consult our certified physicians for diagnosis or treatment.</p>
-                                    
-                                    <h4>2. Data Privacy</h4>
-                                    <p>Your personal and health information is kept secure and handled according to health privacy regulations.</p>
-                                    
-                                    <h4>3. Cancellation</h4>
-                                    <p>Please provide accurate information when booking and give at least 24 hours notice if you need to cancel or reschedule.</p>
-                                
-                                    <h4>4. Patient Conduct</h4>
-                                    <p>We maintain a respectful and safe clinical environment. Service may be refused if behavior disrupts patient care or clinic operations.</p>
-                                
-                                    <button type="button" class="terms-trigger-btn nav-style-button" onclick="window.location.href='about.php#terms'">
-                                        See Full Details
-                                    </button>
-                                </div>
-                                <button type="button" class="legal-confirm-btn" onclick="closeLegalModal()">I Understand</button>
-                            </div>
-                        </div>
-                        
                         <button type="submit" class="submit-request-btn">
                             Confirm Request
                         </button>
+
                         <input type="hidden" name="totalAmount" id="totalAmountInput" value="0">
                         <input type="hidden" name="selectedServicesList" id="servicesListInput" value="">
                     </form>
                 </div>
+
+                <!-- RIGHT (CORRECT POSITION NOW) -->
+                <div class="modal-patient-notes desktop-only">
+
+                    <div class="notes-group">
+                        <label>Patient Vitals</label>
+                        <textarea 
+                            name="patient_vitals"
+                            id="patientVitals"
+                            form="modalBookingForm"
+                            placeholder="Blood Pressure, Heart Rate, Temperature..."
+                            required
+                        ></textarea>
+                    </div>
+
+                    <div class="notes-group">
+                        <label>Patient Concern</label>
+                        <textarea 
+                            name="patient_concern"
+                            id="patientConcern"
+                            form="modalBookingForm"
+                            placeholder="Describe symptoms, pain, concerns..."
+                            required
+                        ></textarea>
+                    </div>
+
+                </div>
+
             </div>
         </div>
     </div>
