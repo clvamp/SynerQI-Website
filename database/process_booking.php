@@ -11,28 +11,36 @@ $generated_id = 0;
 
 // 2. CAPTURE DATA & ALIGN WITH WEBADMIN VARIABLES
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userName'])) {
-    $patient_name = $conn->real_escape_string($_POST['userName']);
-    $userEmail    = $conn->real_escape_string($_POST['userEmail']);
-    $telephone    = $conn->real_escape_string($_POST['userPhone']);
-    $bookingDate  = $_POST['date']; 
-    $bookingTime  = $_POST['bookingTime'];
-    $services     = $conn->real_escape_string($_POST['selectedServicesList']); 
-    $totalAmount  = intval($_POST['totalAmount']);
+    $patient_name    = $conn->real_escape_string($_POST['userName']);
+    $userEmail       = $conn->real_escape_string($_POST['userEmail']);
+    $telephone       = $conn->real_escape_string($_POST['userPhone']);
+    $bookingDate     = $_POST['date']; 
+    $bookingTime     = $_POST['bookingTime'];
+    $services        = $conn->real_escape_string($_POST['selectedServicesList']); 
+    $totalAmount     = intval($_POST['totalAmount']);
+    
+    // New Fields
+    $vitals  = $conn->real_escape_string($_POST['patient_vitals']);
+    $concern = $conn->real_escape_string($_POST['patient_concern']);
 
     // Logic to convert selection to database DATETIME format
     $time = ($bookingTime == "Morning (9AM - 12PM)") ? "09:00:00" : "13:00:00";
     $finalDateTime = $bookingDate . " " . $time;
 
-    // 3. INSERT INTO online_appointments[cite: 7]
+    // 3. INSERT INTO online_appointments
+    // Added patient_vitals and patient_concern to the column list and values
     $sql = "INSERT INTO online_appointments 
-            (patient_name, userEmail, telephone, services, assigned_doctor, date, totalAmount, status)
+            (patient_name, userEmail, telephone, services, assigned_doctor, date, totalAmount, status, vitals, concern)
             VALUES
-            ('$patient_name', '$userEmail', '$telephone', '$services', 'Pending Assignment', '$finalDateTime', '$totalAmount', 'Pending')";
+            ('$patient_name', '$userEmail', '$telephone', '$services', 'Pending Assignment', '$finalDateTime', '$totalAmount', 'Pending', '$vitals', '$concern')";
 
     if ($conn->query($sql)) {
         $success = true;
         // 4. DETECT THE NEWLY GENERATED ID
         $generated_id = $conn->insert_id; 
+    } else {
+        // Optional: Error handling
+        echo "Error: " . $conn->error;
     }
 }
 ?>
@@ -81,11 +89,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userName'])) {
                         <tr><td>Email</td><td><?php echo htmlspecialchars($userEmail); ?></td></tr>
                         <tr><td>Phone</td><td><?php echo htmlspecialchars($telephone); ?></td></tr>
                         <tr><td>Schedule</td><td><?php echo date("M d, Y", strtotime($bookingDate)); ?> (<?php echo $bookingTime; ?>)</td></tr>
+                        
+                        <tr>
+                            <td>Treatments</td>
+                            <td><?php echo htmlspecialchars($services); ?></td>
+                        </tr>
+                        <tr>
+                            <td>Vitals</td>
+                            <td><?php echo !empty($vitals) ? nl2br(htmlspecialchars($vitals)) : '<em>Not provided</em>'; ?></td>
+                        </tr>
+                        <tr>
+                            <td>Concern</td>
+                            <td><?php echo !empty($concern) ? nl2br(htmlspecialchars($concern)) : '<em>Not provided</em>'; ?></td>
+                        </tr>
                         <tr class="total-row"><td>Total Due</td><td>₱<?php echo number_format($totalAmount); ?></td></tr>
                     </tbody>
                 </table>
                 
-                <a href="index.php" class="btn-return-home">Return to Home</a>
+                <a href="../index.php" class="btn-return-home">Return to Home</a>
 
             <?php else: ?>
                 <span class="material-icons-round" style="color: #ff5252; font-size: 80px;">error</span>
