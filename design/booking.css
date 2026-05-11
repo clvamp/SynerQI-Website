@@ -1,0 +1,145 @@
+body { 
+    background-color: #f4f7f7; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    min-height: 100vh; 
+    margin: 0;
+    font-family: 'Poppins', sans-serif; 
+}
+
+/* Header & Nav Alignment */
+header {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 500;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 10px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.logo img { height: 50px; }
+
+nav {
+    display: flex;
+    justify-content: flex-end;
+    flex-grow: 1; 
+}
+
+.nav-links { 
+    list-style: none; 
+    display: flex; 
+    gap: 20px;
+    margin: 0; 
+    padding: 0; 
+}
+
+.nav-links a { 
+    text-decoration: none; 
+    color: #333; 
+    font-weight: 600; 
+    transition: 0.3s; 
+}
+
+.nav-links a:hover { color: #008080; }
+
+/* Content Layout */
+.thank-you-container {
+    margin-top: 120px; 
+    padding: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.thank-you-card { 
+    background: white; 
+    padding: 40px; 
+    border-radius: 20px; 
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+    max-width: 600px; 
+    width: 100%; 
+    text-align: center; 
+}
+
+.schedule-text { 
+    font-size: 1rem; color: #444; margin: 25px 0; font-weight: 600; 
+    background: #e0f2f1; padding: 15px; border-radius: 10px; border-left: 5px solid #008080; 
+}
+
+.transaction-table { width: 100%; border-collapse: collapse; margin-top: 20px; text-align: left; }
+.transaction-table th { color: #888; font-size: 0.75rem; text-transform: uppercase; padding: 10px 0; border-bottom: 1px solid #eee; }
+.transaction-table td { padding: 12px 0; border-bottom: 1px solid #eee; color: #333; }
+.total-row td { color: #008080; font-size: 1.2rem; font-weight: 800; border-bottom: none; padding-top: 20px; }
+
+/* 1. The Container */
+.button-group {
+    display: flex;
+    flex-direction: column; /* Stacks on mobile */
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+}
+
+/* 2. Shared Base Styles (to ensure they are the same size) */
+.btn-status, 
+.btn-return-home {
+    display: inline-block;
+    padding: 14px 30px;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    text-align: center;
+    box-sizing: border-box;
+    width: 100%; /* Full width on mobile */
+    max-width: 280px;
+}
+
+/* 3. "Check Status" Specific (Outline Style) */
+
+.btn-return-home {
+    background-color: white;
+    color: #008080;
+    border: 2px solid #008080;
+}
+
+.btn-return-home:hover  {
+    background-color: #e0f2f1;
+    transform: translateY(-2px);
+}
+
+/* 4. "Return Home" Specific (Solid Style) */
+.btn-status {
+    background-color: #008080;
+    color: white;
+    border: 2px solid #008080; /* Added border to match height of the status button */
+}
+
+.btn-status:hover {
+    background-color: #006060;
+    border-color: #006060;
+    transform: translateY(-2px);
+}
+
+/* 5. Desktop Alignment */
+@media (min-width: 480px) {
+    .button-group {
+        flex-direction: row; /* Side-by-side on desktop */
+    }
+    
+    .btn-status, 
+    .btn-return-home {
+        width: auto; /* Buttons shrink to fit text on desktop */
+    }
+}
