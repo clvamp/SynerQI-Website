@@ -1,3 +1,13 @@
+window.openGeneralModal = function(serviceName) {
+    if (window.openGeneralModalShared) {
+        window.openGeneralModalShared(serviceName);
+    }
+};
+
+window.openGeneralModalShared = function(serviceName) {
+    // Initialized as a placeholder until the page scripts are ready.
+};
+
 document.addEventListener('DOMContentLoaded', function() {
 
     // --- 1. DATE LIMITER ---
@@ -31,105 +41,95 @@ document.addEventListener('DOMContentLoaded', function() {
     
 
 // --- Updated UI Logic ---
-function updateAllDisplays() {
-    let total = 0;
-    let selectedNames = [];
+    function updateAllDisplays() {
+        let total = 0;
+        let selectedNames = [];
 
-    document.querySelectorAll('.service-check:checked').forEach(checkedBox => {
-        total += parseInt(checkedBox.getAttribute('data-price')) || 0;
-        selectedNames.push(checkedBox.value);
-    });
+        document.querySelectorAll('.service-check:checked').forEach(checkedBox => {
+            total += parseInt(checkedBox.getAttribute('data-price')) || 0;
+            selectedNames.push(checkedBox.value);
+        });
 
-    // Update the trigger box text
-    const triggerText = document.getElementById('selectedServicesText');
-    if (selectedNames.length > 0) {
-        triggerText.innerText = selectedNames.join(", ");
-        triggerText.style.color = "#008080"; // Change color when selected
-    } else {
-        triggerText.innerText = "Select Treatments";
-        triggerText.style.color = "#333";
-    }
-
-    // Update your existing price/hidden inputs logic below...
-    const formattedTotal = "₱" + total.toLocaleString();
-    if (document.getElementById('cartTotal')) cartTotal.innerText = formattedTotal;
-    if (document.getElementById('totalAmountInput')) totalAmountInput.value = total;
-}
-
-// Logic to close dropdown when clicking outside
-window.addEventListener('click', function(e) {
-    const dropdown = document.getElementById('servicesSelectionOverlay');
-    const trigger = document.getElementById('serviceToggleButton');
-    const wrapper = document.querySelector('.custom-select-wrapper');
-
-    if (!trigger.contains(e.target) && !dropdown.contains(e.target)) {
-        dropdown.classList.remove('active');
-        wrapper.classList.remove('is-open');
-    }
-});
-
-    // --- 3. CONSOLIDATED CALCULATION LOGIC ---
-    const checkboxes = document.querySelectorAll('.service-check');
-    
-    // UI Display elements
-    const cartTotal = document.getElementById('cartTotal');
-    const selectedList = document.getElementById('selectedList');
-    const totalPaymentDisplay = document.getElementById('modalTotalPayment');
-    const servicesListDisplay = document.getElementById('modalServicesList');
-
-    // HIDDEN INPUTS (These send data to process_booking.php)
-    const totalAmountInput = document.getElementById('totalAmountInput');
-    const servicesListInput = document.getElementById('servicesListInput');
-
-    // --- Updated UI Logic ---
-function updateAllDisplays() {
-    let total = 0;
-    let selectedNames = [];
-
-    // 1. Gather data
-    document.querySelectorAll('.service-check:checked').forEach(checkedBox => {
-        total += parseInt(checkedBox.getAttribute('data-price')) || 0;
-        selectedNames.push(checkedBox.value);
-    });
-
-    // 2. Update Total Payment
-    const cartTotal = document.getElementById('cartTotal');
-    if (cartTotal) cartTotal.innerText = "₱" + total.toLocaleString();
-
-    // 3. Conditional Formatting Logic
-    const isMobile = window.innerWidth <= 768;
-
-    if (isMobile) {
-        const commaDisplay = document.getElementById('servicesComma');
-        if (commaDisplay) {
-            commaDisplay.innerText = selectedNames.length > 0 ? selectedNames.join(", ") : "No services selected";
+        const triggerText = document.getElementById('selectedServicesText');
+        if (triggerText) {
+            if (selectedNames.length > 0) {
+                triggerText.innerText = selectedNames.join(", ");
+                triggerText.style.color = "#008080";
+            } else {
+                triggerText.innerText = "Select Treatments";
+                triggerText.style.color = "#333";
+            }
         }
-    } else {
+
+        const cartTotalElement = document.getElementById('cartTotal');
+        if (cartTotalElement) cartTotalElement.innerText = "₱" + total.toLocaleString();
+
         const listDisplay = document.getElementById('servicesList');
-        const detailsElement = document.getElementById('servicesDropdown');
-        
         if (listDisplay) {
             if (selectedNames.length > 0) {
                 listDisplay.innerHTML = selectedNames.map(name => `<li>${name}</li>`).join("");
-                if (detailsElement) detailsElement.setAttribute('open', ''); // Keep shown
             } else {
                 listDisplay.innerHTML = '<li class="no-services">No services selected</li>';
             }
         }
+
+        const totalInput = document.getElementById('totalAmountInput');
+        const servicesInput = document.getElementById('servicesListInput');
+        if (totalInput) totalInput.value = total;
+        if (servicesInput) servicesInput.value = selectedNames.join(", ");
     }
 
-    // 4. Update hidden inputs for PHP form submission
-    const totalInput = document.getElementById('totalAmountInput');
-    const servicesInput = document.getElementById('servicesListInput');
-    if (totalInput) totalInput.value = total;
-    if (servicesInput) servicesInput.value = selectedNames.join(", ");
-}
+    window.updateAllDisplays = updateAllDisplays;
+
+    // Logic to close dropdown when clicking outside
+    window.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('servicesSelectionOverlay');
+        const trigger = document.getElementById('serviceToggleButton');
+        const wrapper = document.querySelector('.custom-select-wrapper');
+
+        if (trigger && dropdown && wrapper && !trigger.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.remove('active');
+            wrapper.classList.remove('is-open');
+        }
+    });
+
+    const checkboxes = document.querySelectorAll('.service-check');
     checkboxes.forEach(box => {
         box.addEventListener('change', updateAllDisplays);
     });
 
     updateAllDisplays();
-});
+
+    window.selectServiceInModal = function(serviceName) {
+        if (!serviceName) return;
+        const serviceCheckbox = document.querySelector(`.service-check[value="${serviceName}"]`);
+        if (serviceCheckbox) {
+            serviceCheckbox.checked = true;
+            updateAllDisplays();
+        }
+    };
+
+    window.openGeneralModalShared = function(serviceName) {
+        const modal = document.getElementById('bookingModal');
+        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+
+        if (serviceName) {
+            window.selectServiceInModal(serviceName);
+        }
+
+        if (modal) {
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+            document.body.style.overflow = 'hidden';
+        }
+    };
+
+    window.openGeneralModal = function(serviceName) {
+        if (window.openGeneralModalShared) {
+            window.openGeneralModalShared(serviceName);
+        }
+    };
 
 // --- Terms & Services Modal Logic ---
 window.openLegalModal = function() {
@@ -276,4 +276,5 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
+});
 });
