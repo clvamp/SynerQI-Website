@@ -69,52 +69,5 @@ let scrollToTopButton = document.getElementById("scrollToTopBtn");
         window.addEventListener('scroll', fadeInOnScroll);
         fadeInOnScroll(); 
 
-        const modal = document.getElementById('bookingModal');
-        const modalImg = document.getElementById('modalImg');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalPrice = document.getElementById('modalPrice');
-        const serviceSelect = document.getElementById('serviceSelect');
-        const dateInput = document.getElementById('bookingDate');
-        const today = new Date().toISOString().split('T')[0];
-        dateInput.setAttribute('min', today);
-
-        function getScrollbarWidth() {
-            return window.innerWidth - document.documentElement.clientWidth;
-        }
-
-        window.openGeneralModal = function() {
-            const scrollbarWidth = getScrollbarWidth();
-            document.body.style.paddingRight = `${scrollbarWidth}px`;
-            
-            // FIX: Changed back to 'flex' so it centers properly on screen
-            modal.style.display = 'flex'; 
-            
-            setTimeout(() => modal.classList.add('active'), 10);
-            
-            // Stops background from scrolling
-            document.body.style.overflow = 'hidden'; 
-            
-            // Forces the form to start at the top when opened
-            const formSection = document.querySelector('.modal-form-section');
-            if (formSection) formSection.scrollTop = 0;
-        }
-
-        window.closeModal = function() {
-            modal.classList.remove('active');
-            setTimeout(() => { 
-                modal.style.display = 'none'; 
-                document.body.style.overflow = 'auto';
-                document.body.style.paddingRight = '0px';
-            }, 300);
-        }
-
-        modal.addEventListener('click', e => { if(e.target === modal) closeModal(); });
-        
-        document.getElementById('modalBookingForm').addEventListener('submit', function(e) {
-            // e.preventDefault();
-            const service = document.getElementById('serviceSelect').value;
-            const name = document.getElementById('userName').value;
-            const date = document.getElementById('bookingDate').value;
-            // window.location.href = `mailto:emantablizo520@gmail.com?subject=Booking: ${service}&body=Name: ${name}%0D%0ADate: ${date}`;
-            closeModal();
-        });
+        // Navbar only handles menu, scroll, and fade-in behavior.
+        // Booking modal open/close and form submission are handled in script/bookapp.js.
