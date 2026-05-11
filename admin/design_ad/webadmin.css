@@ -26,6 +26,10 @@
     display: flex;
 }
 
+.delete-overlay.active .delete-modal-box {
+    transform: scale(1);
+}
+
 /* Button Styling within Modal */
 .btn-confirm {
     background-color: #ef4444; /* red-500 */
@@ -360,4 +364,102 @@
 
 .patient-row:hover {
     background: #f0fdfa;
+}
+
+/* Validation Notice Modal Overlay */
+.notice-overlay {
+    display: none !important; /* Forces it to stay hidden on page load */
+    position: fixed; 
+    inset: 0; 
+    background: rgba(0, 0, 0, 0.6); 
+    backdrop-filter: blur(2px); 
+    align-items: center; 
+    justify-content: center; 
+    z-index: 9999;
+    padding: 20px;
+}
+
+/* Toggle class for JavaScript */
+.notice-overlay.active { 
+    display: flex !important; /* Overrides the hidden state when active */
+}
+
+/* Modal Box Container */
+.notice-box { 
+    background: #ffffff; 
+    padding: 2rem; 
+    border-radius: 16px; 
+    max-width: 420px; 
+    width: 100%;
+    text-align: center; 
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Modal Header & Icon */
+.notice-header { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 12px; 
+    margin-bottom: 1.25rem; 
+}
+
+.notice-icon { 
+    font-size: 3rem !important; 
+    color: #f59e0b; 
+}
+
+#noticeTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+}
+
+/* Modal Body Text */
+.notice-body p { 
+    color: #4b5563;
+    line-height: 1.6;
+    margin: 0;
+    font-size: 1rem;
+}
+
+/* Modal Footer & Button */
+.notice-footer { 
+    margin-top: 2rem; 
+}
+
+.btn-confirm {
+    background-color: #1e293b; 
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: 100%; 
+}
+
+.btn-confirm:hover {
+    background-color: #334155;
+}
+
+/* Validation Visual Feedback for the empty fields */
+.validation-highlight { 
+    border: 2px solid #ef4444 !important; 
+    background-color: #fef2f2 !important; 
+    outline: none; /* Removes default focus ring to show the red border clearly */
+    transition: all 0.3s ease;
+}
+
+/* Subtle pop-in animation when the modal appears */
+.notice-overlay.active .notice-box {
+    animation: modalPop 0.3s ease-out;
+}
+
+@keyframes modalPop {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
 }
