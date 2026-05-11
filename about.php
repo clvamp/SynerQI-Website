@@ -231,6 +231,12 @@
                         <h3>4. Patient Conduct</h3>
                         <p>SynerQi maintains a safe healing environment. We reserve the right to refuse service to anyone engaging in behavior that compromises the safety or integrity of our clinical operations or patient management systems.</p>
                     </div>
+
+
+                </div>
+
+                <div style="text-align: center; margin: 2rem 0;">
+                    <button type="button" class="cta-button" onclick="window.location.href='index.php?openModal=1#home'">Return</button>
                 </div>
 
                 <div class="legal-footer-note">
@@ -536,53 +542,6 @@
         };
         window.addEventListener('scroll', fadeInOnScroll);
         fadeInOnScroll(); 
-
-        const modal = document.getElementById('bookingModal');
-        const modalImg = document.getElementById('modalImg');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalPrice = document.getElementById('modalPrice');
-        const serviceSelect = document.getElementById('serviceSelect');
-        const dateInput = document.getElementById('bookingDate');
-        const today = new Date().toISOString().split('T')[0];
-        dateInput.setAttribute('min', today);
-
-        function getScrollbarWidth() {
-            return window.innerWidth - document.documentElement.clientWidth;
-        }
-
-        window.openGeneralModal = function(serviceName) {
-            if (window.openGeneralModalShared) {
-                window.openGeneralModalShared(serviceName);
-            }
-        }
-
-        window.closeModal = function() {
-            modal.classList.remove('active');
-            setTimeout(() => { 
-                modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-                document.body.style.paddingRight = '0px';
-            }, 300);
-        }
-
-        function updateModalContext(selectElement) {
-            const selectedOption = selectElement.options[selectElement.selectedIndex];
-            modalTitle.innerText = selectedOption.value;
-            modalPrice.innerText = selectedOption.getAttribute('data-price');
-            modalImg.src = selectedOption.getAttribute('data-img');
-        }
-
-        modal.addEventListener('click', e => { if(e.target === modal) closeModal(); });
-
-        document.getElementById('modalBookingForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const service = document.getElementById('serviceSelect').value;
-            const name = document.getElementById('userName').value;
-            const date = document.getElementById('bookingDate').value;
-            
-            window.location.href = `mailto:emantablizo520@gmail.com?subject=Booking: ${service}&body=Name: ${name}%0D%0ADate: ${date}`;
-            closeModal();
-        });
 
         const scrollToTopBtn = document.getElementById("scrollToTopBtn");
         window.addEventListener("scroll", () => {
