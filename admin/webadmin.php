@@ -213,6 +213,21 @@ if (isset($_SESSION['admin_logged_in'])) {
     }
     $sort = $_SESSION['sort_mode'] ?? 'date';
 
+    // DASHBOARD: pull online appointments so overview cards populate correctly
+    if ($current_page === 'dashboard') {
+        $query = "
+            SELECT *
+            FROM online_appointments
+            ORDER BY date DESC
+        ";
+        $result = $conn->query($query);
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $patients[] = $row;
+            }
+        }
+    }
+
     // ONLINE APPOINTMENTS
     if ($current_page === 'online') {
         if ($sort === 'priority') {
