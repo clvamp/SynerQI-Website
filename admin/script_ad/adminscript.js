@@ -1,101 +1,428 @@
-// --- CALENDAR LOGIC ---
-    function loadCalendar() {
-        const dt = new Date();
-        if (nav !== 0) {
-            dt.setMonth(new Date().getMonth() + nav);
-        }
+// =====================================================
+// --- CALENDAR LOGIC: ONLINE ---
+// =====================================================
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); 
-        
-        // Limiter
-        const endLimit = new Date();
-        endLimit.setDate(today.getDate() + 7); 
-        endLimit.setHours(23, 59, 59, 999);
+let onlineNav = 0;
 
-        const month = dt.getMonth();
-        const year = dt.getFullYear();
+const onlineCalendarDays = document.getElementById('onlineCalendarDays');
+const onlineMonthYearDisplay = document.getElementById('onlineMonthYearDisplay');
+const onlineSelectedDateDisplay = document.getElementById('onlineSelectedDateDisplay');
+const onlineAppointmentsList = document.getElementById('onlineAppointmentsList');
 
-        const firstDayOfMonth = new Date(year, month, 1);
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const paddingDays = firstDayOfMonth.getDay();
+function loadOnlineCalendar() {
 
-        monthYearDisplay.innerText = dt.toLocaleDateString('en-us', { month: 'long', year: 'numeric' });
-        calendarDays.innerHTML = '';
+    const dt = new Date();
 
-        for(let i = 1; i <= paddingDays + daysInMonth; i++) {
-            const daySquare = document.createElement('div');
-            // Base styles for all active days
-            daySquare.classList.add('py-2', 'border', 'border-gray-50', 'rounded-lg', 'min-h-[70px]', 'flex', 'flex-col', 'items-center', 'justify-start', 'transition');
+    if (onlineNav !== 0) {
+        dt.setMonth(new Date().getMonth() + onlineNav);
+    }
 
-            if (i > paddingDays) {
-                const dayNum = i - paddingDays;
-                const dateToCheck = new Date(year, month, dayNum);
-                const dayString = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
-                
-                daySquare.innerText = dayNum;
-                const dayEvents = calendarEvents[dayString];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-                // ALLOW ACCESS: We no longer check if (dateToCheck >= today)
-                // We only check the future limit if you still want to restrict bookings too far ahead
-                const isTooFarInFuture = dateToCheck > endLimit;
+    // LIMITER
+    const endLimit = new Date();
+    endLimit.setDate(today.getDate() + 7);
+    endLimit.setHours(23, 59, 59, 999);
 
-                if (!isTooFarInFuture) {
-                    // ENABLED STYLES (Past days and Next 7 days)
-                    daySquare.classList.add('cursor-pointer', 'hover:border-primary', 'hover:shadow-sm', 'text-gray-800');
-                    daySquare.onclick = () => showAppointments(dayString, dayEvents);
+    const month = dt.getMonth();
+    const year = dt.getFullYear();
 
-                    // Highlight days with appointments
-                    if (dayEvents && dayEvents.length > 0) {
-                        daySquare.classList.add('bg-teal-50', 'text-teal-700', 'font-medium');
-                        const badge = document.createElement('div');
-                        badge.classList.add('mt-1', 'bg-teal-500', 'text-white', 'text-[10px]', 'px-2', 'py-0.5', 'rounded-full');
-                        badge.innerText = `${dayEvents.length} Appt${dayEvents.length > 1 ? 's' : ''}`;
-                        daySquare.appendChild(badge);
-                    }
+    const firstDayOfMonth = new Date(year, month, 1);
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const paddingDays = firstDayOfMonth.getDay();
 
-                    // Highlight Today specifically
-                    if (dateToCheck.getTime() === today.getTime()) {
-                        daySquare.classList.add('ring-2', 'ring-primary', 'font-bold');
-                    }
-                } else {
-                    // DISABLED STYLES (Only for dates far in the future)
-                    daySquare.classList.add('bg-gray-100', 'text-gray-300', 'cursor-not-allowed', 'opacity-50');
+    onlineMonthYearDisplay.innerText =
+        dt.toLocaleDateString('en-us', {
+            month: 'long',
+            year: 'numeric'
+        });
+
+    onlineCalendarDays.innerHTML = '';
+
+    for (let i = 1; i <= paddingDays + daysInMonth; i++) {
+
+        const daySquare = document.createElement('div');
+
+        daySquare.classList.add(
+            'py-2',
+            'border',
+            'border-gray-50',
+            'rounded-lg',
+            'min-h-[70px]',
+            'flex',
+            'flex-col',
+            'items-center',
+            'justify-start',
+            'transition'
+        );
+
+        if (i > paddingDays) {
+
+            const dayNum = i - paddingDays;
+
+            const dateToCheck = new Date(year, month, dayNum);
+
+            const dayString =
+                `${year}-${String(month + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
+
+            daySquare.innerText = dayNum;
+
+            const dayEvents = onlineCalendarEvents[dayString];
+
+            const isTooFarInFuture = dateToCheck > endLimit;
+
+            if (!isTooFarInFuture) {
+
+                daySquare.classList.add(
+                    'cursor-pointer',
+                    'hover:border-primary',
+                    'hover:shadow-sm',
+                    'text-gray-800'
+                );
+
+                daySquare.onclick = () =>
+                    showOnlineAppointments(dayString, dayEvents);
+
+                // APPOINTMENT BADGE
+                if (dayEvents && dayEvents.length > 0) {
+
+                    daySquare.classList.add(
+                        'bg-teal-50',
+                        'text-teal-700',
+                        'font-medium'
+                    );
+
+                    const badge = document.createElement('div');
+
+                    badge.classList.add(
+                        'mt-1',
+                        'bg-teal-500',
+                        'text-white',
+                        'text-[10px]',
+                        'px-2',
+                        'py-0.5',
+                        'rounded-full'
+                    );
+
+                    badge.innerText =
+                        `${dayEvents.length} Appt${dayEvents.length > 1 ? 's' : ''}`;
+
+                    daySquare.appendChild(badge);
+                }
+
+                // TODAY
+                if (dateToCheck.getTime() === today.getTime()) {
+
+                    daySquare.classList.add(
+                        'ring-2',
+                        'ring-primary',
+                        'font-bold'
+                    );
                 }
 
             } else {
-                daySquare.classList.add('bg-gray-50', 'text-transparent', 'pointer-events-none');
+
+                // DISABLED FUTURE DAYS
+                daySquare.classList.add(
+                    'bg-gray-100',
+                    'text-gray-300',
+                    'cursor-not-allowed',
+                    'opacity-50'
+                );
             }
 
-            calendarDays.appendChild(daySquare);
+        } else {
+
+            daySquare.classList.add(
+                'bg-gray-50',
+                'text-transparent',
+                'pointer-events-none'
+            );
         }
+
+        onlineCalendarDays.appendChild(daySquare);
+    }
+}
+
+function showOnlineAppointments(dateString, dayEvents) {
+
+    const displayDt = new Date(dateString);
+
+    onlineSelectedDateDisplay.innerText =
+        `Scheduled for ${displayDt.toLocaleDateString('en-us', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+        })}`;
+
+    onlineAppointmentsList.innerHTML = '';
+
+    if (!dayEvents || dayEvents.length === 0) {
+
+        onlineAppointmentsList.innerHTML =
+            '<p class="text-sm text-gray-400 italic text-center mt-4">No patients scheduled.</p>';
+
+        return;
     }
 
-    function showAppointments(dateString, dayEvents) {
-        const displayDt = new Date(dateString);
-        selectedDateDisplay.innerText = `Scheduled for ${displayDt.toLocaleDateString('en-us', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}`;
-        dateAppointmentsList.innerHTML = '';
+    dayEvents.forEach(event => {
 
-        if (!dayEvents || dayEvents.length === 0) {
-            dateAppointmentsList.innerHTML = '<p class="text-sm text-gray-400 italic text-center mt-4">No patients scheduled.</p>';
-            return;
-        }
+        const evDiv = document.createElement('div');
 
-        dayEvents.forEach(event => {
-            const evDiv = document.createElement('div');
-            evDiv.classList.add('p-3', 'bg-gray-50', 'border', 'border-gray-100', 'rounded-lg', 'flex', 'flex-col', 'gap-1');
-            evDiv.innerHTML = `
-                <div class="font-semibold text-gray-800 text-sm">${event.name}</div>
-                <div class="flex items-center gap-2 text-xs text-gray-500">
-                    <i class="far fa-clock text-primary"></i> ${event.time}
-                </div>
-                <div class="flex items-center gap-2 text-xs text-gray-500">
-                    <i class="fas fa-user-md text-primary"></i> ${event.doctor}
-                </div>
-            `;
-            dateAppointmentsList.appendChild(evDiv);
+        evDiv.classList.add(
+            'p-3',
+            'bg-gray-50',
+            'border',
+            'border-gray-100',
+            'rounded-lg',
+            'flex',
+            'flex-col',
+            'gap-1'
+        );
+
+        evDiv.innerHTML = `
+            <div class="font-semibold text-gray-800 text-sm">
+                ${event.name}
+            </div>
+
+            <div class="flex items-center gap-2 text-xs text-gray-500">
+                <i class="far fa-clock text-primary"></i>
+                ${event.time}
+            </div>
+
+            <div class="flex items-center gap-2 text-xs text-gray-500">
+                <i class="fas fa-user-md text-primary"></i>
+                ${event.doctor}
+            </div>
+        `;
+
+        onlineAppointmentsList.appendChild(evDiv);
+    });
+}
+
+function onlinePrevMonth() {
+    onlineNav--;
+    loadOnlineCalendar();
+}
+
+function onlineNextMonth() {
+    onlineNav++;
+    loadOnlineCalendar();
+}
+
+
+
+// =====================================================
+// --- CALENDAR LOGIC: HISTORY ---
+// =====================================================
+
+let historyNav = 0;
+
+const historyCalendarDays = document.getElementById('historyCalendarDays');
+const historyMonthYearDisplay = document.getElementById('historyMonthYearDisplay');
+const historySelectedDateDisplay = document.getElementById('historySelectedDateDisplay');
+const historyAppointmentsList = document.getElementById('historyAppointmentsList');
+
+function loadHistoryCalendar() {
+
+    const dt = new Date();
+
+    if (historyNav !== 0) {
+        dt.setMonth(new Date().getMonth() + historyNav);
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const month = dt.getMonth();
+    const year = dt.getFullYear();
+
+    const firstDayOfMonth = new Date(year, month, 1);
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const paddingDays = firstDayOfMonth.getDay();
+
+    historyMonthYearDisplay.innerText =
+        dt.toLocaleDateString('en-us', {
+            month: 'long',
+            year: 'numeric'
         });
+
+    historyCalendarDays.innerHTML = '';
+
+    for (let i = 1; i <= paddingDays + daysInMonth; i++) {
+
+        const daySquare = document.createElement('div');
+
+        daySquare.classList.add(
+            'py-2',
+            'border',
+            'border-gray-50',
+            'rounded-lg',
+            'min-h-[70px]',
+            'flex',
+            'flex-col',
+            'items-center',
+            'justify-start',
+            'transition'
+        );
+
+        if (i > paddingDays) {
+
+            const dayNum = i - paddingDays;
+
+            const dateToCheck = new Date(year, month, dayNum);
+
+            const dayString =
+                `${year}-${String(month + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
+
+            daySquare.innerText = dayNum;
+
+            const dayEvents = historyCalendarEvents[dayString];
+
+            // HISTORY = ONLY TODAY OR PAST
+            const isFutureDate = dateToCheck > today;
+
+            if (!isFutureDate) {
+
+                daySquare.classList.add(
+                    'cursor-pointer',
+                    'hover:border-primary',
+                    'hover:shadow-sm',
+                    'text-gray-800'
+                );
+
+                daySquare.onclick = () =>
+                    showHistoryAppointments(dayString, dayEvents);
+
+                // APPOINTMENT BADGE
+                if (dayEvents && dayEvents.length > 0) {
+
+                    daySquare.classList.add(
+                        'bg-amber-50',
+                        'text-amber-700',
+                        'font-medium'
+                    );
+
+                    const badge = document.createElement('div');
+
+                    badge.classList.add(
+                        'mt-1',
+                        'bg-amber-500',
+                        'text-white',
+                        'text-[10px]',
+                        'px-2',
+                        'py-0.5',
+                        'rounded-full'
+                    );
+
+                    badge.innerText =
+                        `${dayEvents.length} Record${dayEvents.length > 1 ? 's' : ''}`;
+
+                    daySquare.appendChild(badge);
+                }
+
+                // TODAY
+                if (dateToCheck.getTime() === today.getTime()) {
+
+                    daySquare.classList.add(
+                        'ring-2',
+                        'ring-primary',
+                        'font-bold'
+                    );
+                }
+
+            } else {
+
+                // DISABLED FUTURE DAYS
+                daySquare.classList.add(
+                    'bg-gray-100',
+                    'text-gray-300',
+                    'cursor-not-allowed',
+                    'opacity-50'
+                );
+            }
+
+        } else {
+
+            daySquare.classList.add(
+                'bg-gray-50',
+                'text-transparent',
+                'pointer-events-none'
+            );
+        }
+
+        historyCalendarDays.appendChild(daySquare);
     }
+}
+
+function showHistoryAppointments(dateString, dayEvents) {
+
+    const displayDt = new Date(dateString);
+
+    historySelectedDateDisplay.innerText =
+        `Records for ${displayDt.toLocaleDateString('en-us', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+        })}`;
+
+    historyAppointmentsList.innerHTML = '';
+
+    if (!dayEvents || dayEvents.length === 0) {
+
+        historyAppointmentsList.innerHTML =
+            '<p class="text-sm text-gray-400 italic text-center mt-4">No records found.</p>';
+
+        return;
+    }
+
+    dayEvents.forEach(event => {
+
+        const evDiv = document.createElement('div');
+
+        evDiv.classList.add(
+            'p-3',
+            'bg-gray-50',
+            'border',
+            'border-gray-100',
+            'rounded-lg',
+            'flex',
+            'flex-col',
+            'gap-1'
+        );
+
+        evDiv.innerHTML = `
+            <div class="font-semibold text-gray-800 text-sm">
+                ${event.name}
+            </div>
+
+            <div class="flex items-center gap-2 text-xs text-gray-500">
+                <i class="far fa-clock text-primary"></i>
+                ${event.time}
+            </div>
+
+            <div class="flex items-center gap-2 text-xs text-gray-500">
+                <i class="fas fa-user-md text-primary"></i>
+                ${event.doctor}
+            </div>
+        `;
+
+        historyAppointmentsList.appendChild(evDiv);
+    });
+}
+
+function historyPrevMonth() {
+    historyNav--;
+    loadHistoryCalendar();
+}
+
+function historyNextMonth() {
+    historyNav++;
+    loadHistoryCalendar();
+}
 
 // --- MODAL & FORM LOGIC ---
 function openModal(id) {
@@ -366,143 +693,3 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                 }
             }
-
-function openViewModal(patient) {
-    document.getElementById('view_db_id').value = patient.id;
-    document.getElementById('view_name').innerText = patient.userName || patient.patient_name || 'Unknown';
-    document.getElementById('view_phone').innerText = patient.userPhone || patient.telephone || 'N/A';
-    document.getElementById('view_schedule').innerText = patient.date ? new Date(patient.date).toLocaleDateString() : 'N/A';
-    document.getElementById('view_doctor').value = patient.assigned_doctor || "";
-    
-    openModal('viewPatientModal');
-}
-
-function showAppointments(dateString, dayEvents) {
-    selectedDateDisplay.innerText = `Scheduled for ${dateString}`;
-    dateAppointmentsList.innerHTML = '';
-
-    if (!dayEvents || dayEvents.length === 0) {
-        dateAppointmentsList.innerHTML = '<p class="text-sm text-gray-400 italic">No patients.</p>';
-        return;
-    }
-
-    dayEvents.forEach(event => {
-        const isConfirmed = event.is_confirmed == 1;
-        const evDiv = document.createElement('div');
-        
-        // This adds the gold border if confirmed
-        evDiv.className = `p-3 bg-white border rounded-lg flex flex-col gap-1 ${isConfirmed ? 'border-amber-400 ring-2 ring-amber-100' : 'border-gray-100'}`;
-        
-        evDiv.innerHTML = `
-            <div class="flex justify-between items-start">
-                <div class="font-bold text-gray-800 text-sm">${event.name}</div>
-                ${isConfirmed ? '<span class="text-[10px] text-amber-600 font-bold">CONFIRMED</span>' : ''}
-            </div>
-            <div class="text-xs text-gray-500"><i class="far fa-clock"></i> ${event.time}</div>
-            <div class="text-xs text-gray-500"><i class="fas fa-user-md"></i> ${event.doctor}</div>
-        `;
-        dateAppointmentsList.appendChild(evDiv);
-    });
-}
-
-// --- DELETE ACTION
-
-let formToSubmit = null; 
-
-function confirmDelete(buttonElement) {
-    // Find the specific form that contains this button
-    formToSubmit = buttonElement.closest('form');
-    
-    // Show the modal
-    const modal = document.getElementById('deleteConfirmModal');
-    modal.classList.add('active');
-}
-
-function closeDeleteModal() {
-    const modal = document.getElementById('deleteConfirmModal');
-    modal.classList.remove('active');
-    formToSubmit = null; 
-}
-
-// Attach the actual submission to the "Yes, Delete" button
-document.addEventListener("DOMContentLoaded", function() {
-    const confirmBtn = document.getElementById('confirmDeleteBtn');
-    if (confirmBtn) {
-        confirmBtn.addEventListener('click', function() {
-            if (formToSubmit) {
-                formToSubmit.submit();
-            }
-        });
-    }
-
-    // Close modal if they click outside the box
-    const modalOverlay = document.getElementById('deleteConfirmModal');
-    if (modalOverlay) {
-        modalOverlay.addEventListener('click', function(e) {
-            if (e.target === this) closeDeleteModal();
-        });
-    }
-});
-
-/* Edit Action */
-function openModal(id) {
-    const modal = document.getElementById(id);
-
-    if (modal) {
-        modal.classList.add('active');
-    }
-}
-
-function closeModal(id) {
-    const modal = document.getElementById(id);
-
-    if (modal) {
-        modal.classList.remove('active');
-    }
-}
-
-function editPatient(id, name, email, date, phone, doctor, isConfirmed) {
-    if (Number(isConfirmed) === 1) {
-        alert("This appointment is already confirmed and cannot be edited.");
-        return;
-    }
-
-    document.getElementById('edit_patient_id_display').value = id;
-    document.getElementById('edit_db_id').value = id;
-    document.getElementById('edit_name').value = name;
-    document.getElementById('edit_email').value = email;
-    document.getElementById('edit_date').value = date;
-    document.getElementById('edit_phone').value = phone;
-    document.getElementById('edit_doctor').value = doctor;
-
-    openModal('editModal');
-}
-
-/* Confirmation */
-function confirmAppointment(patientId, doctorAssigned) {
-    if (!doctorAssigned || doctorAssigned === "") {
-        // show modal instead
-        document.getElementById("doctorRequiredModal").classList.remove("hidden");
-
-        // attach redirect
-        document.getElementById("goToEditBtn").onclick = function () {
-            window.location.href = "edit_patient.php?id=" + patientId;
-        };
-
-        return;
-    }
-
-    // proceed with actual confirmation
-    proceedConfirmation(patientId);
-}
-
-function closeDoctorModal() {
-    document.getElementById("doctorRequiredModal").classList.add("hidden");
-}
-
-function proceedConfirmation(patientId) {
-    const form = event.target.closest('form');
-    form.submit();
-}
-
-/* Done Appointment */
