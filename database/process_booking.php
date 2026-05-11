@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 // 1. DATABASE CONNECTION
 $conn = new mysqli('127.0.0.1', 'root', '', 'synerqi_db');
 
@@ -37,11 +39,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userName'])) {
     if ($conn->query($sql)) {
         $success = true;
         // 4. DETECT THE NEWLY GENERATED ID
-        $generated_id = $conn->insert_id; 
+        $generated_id = $conn->insert_id;
+
+        $_SESSION['booking_success'] = true;
+        $_SESSION['booking_data'] = [
+            'patient_name' => $patient_name,
+            'userEmail' => $userEmail,
+            'telephone' => $telephone,
+            'bookingDate' => $bookingDate,
+            'bookingTime' => $bookingTime,
+            'services' => $services,
+            'totalAmount' => $totalAmount,
+            'vitals' => $vitals,
+            'concern' => $concern,
+            'generated_id' => $generated_id,
+        ];
+
+        header('Location: process_booking.php?success=1');
+        exit();
     } else {
         // Optional: Error handling
         echo "Error: " . $conn->error;
     }
+}
+
+if ($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET['success']) && $_GET['success'] == '1' && !empty($_SESSION['booking_data'])) {
+    $success = true;
+    $bookingData = $_SESSION['booking_data'];
+    $patient_name = $bookingData['patient_name'];
+    $userEmail = $bookingData['userEmail'];
+    $telephone = $bookingData['telephone'];
+    $bookingDate = $bookingData['bookingDate'];
+    $bookingTime = $bookingData['bookingTime'];
+    $services = $bookingData['services'];
+    $totalAmount = $bookingData['totalAmount'];
+    $vitals = $bookingData['vitals'];
+    $concern = $bookingData['concern'];
+    $generated_id = $bookingData['generated_id'];
 }
 ?>
 
