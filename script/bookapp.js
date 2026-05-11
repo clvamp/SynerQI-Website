@@ -81,6 +81,94 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.updateAllDisplays = updateAllDisplays;
 
+    // --- FORM DATA PERSISTENCE ---
+    async function saveFormData() {
+        const formData = {};
+
+        // Save text inputs
+        const inputs = document.querySelectorAll('#modalBookingForm input[type="text"], #modalBookingForm input[type="email"], #modalBookingForm input[type="tel"], #modalBookingForm input[type="date"]');
+        inputs.forEach(input => {
+            formData[input.name] = input.value;
+        });
+
+        // Save select
+        const selects = document.querySelectorAll('#modalBookingForm select');
+        selects.forEach(select => {
+            formData[select.name] = select.value;
+        });
+
+        // Save textareas
+        const textareas = document.querySelectorAll('#modalBookingForm textarea');
+        textareas.forEach(textarea => {
+            formData[textarea.name] = textarea.value;
+        });
+
+        // Save checkboxes (services)
+        const checkedServices = [];
+        document.querySelectorAll('.service-check:checked').forEach(checkbox => {
+            checkedServices.push(checkbox.value);
+        });
+        formData.checkedServices = checkedServices;
+
+        // Save terms checkbox
+        const termsCheck = document.getElementById('termsCheck');
+        if (termsCheck) {
+            formData.terms_agreed = termsCheck.checked;
+        }
+
+        try {
+            await fetch('save_form_data.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+        } catch (error) {
+            console.error('Error saving form data:', error);
+        }
+    }
+
+    async function loadFormData() {
+        try {
+            const response = await fetch('save_form_data.php');
+            const formData = await response.json();
+
+            // Load text inputs
+            Object.keys(formData).forEach(key => {
+                if (key === 'checkedServices' || key === 'terms_agreed') return;
+                const input = document.querySelector(`#modalBookingForm [name="${key}"]`);
+                if (input) {
+                    input.value = formData[key];
+                }
+            });
+
+            // Load services checkboxes
+            if (formData.checkedServices) {
+                document.querySelectorAll('.service-check').forEach(checkbox => {
+                    checkbox.checked = formData.checkedServices.includes(checkbox.value);
+                });
+            }
+
+            // Load terms checkbox
+            if (formData.terms_agreed !== undefined) {
+                const termsCheck = document.getElementById('termsCheck');
+                if (termsCheck) {
+                    termsCheck.checked = formData.terms_agreed;
+                }
+            }
+
+            // Update displays after loading
+            updateAllDisplays();
+        } catch (error) {
+            console.error('Error loading form data:', error);
+        }
+    }
+
+    // Add event listeners to save data on change
+    document.addEventListener('input', saveFormData);
+    document.addEventListener('change', saveFormData);
+
     // Logic to close dropdown when clicking outside
     window.addEventListener('click', function(e) {
         const dropdown = document.getElementById('servicesSelectionOverlay');
@@ -99,6 +187,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     updateAllDisplays();
+
+    const bookingModal = document.getElementById('bookingModal');
+    if (bookingModal) {
+        bookingModal.addEventListener('click', function(e) {
+            if (e.target === bookingModal) {
+                window.closeModal();
+            }
+        });
+    }
 
     window.selectServiceInModal = function(serviceName) {
         if (!serviceName) return;
@@ -123,6 +220,20 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => modal.classList.add('active'), 10);
             document.body.style.overflow = 'hidden';
         }
+
+        // Load saved form data
+        loadFormData();
+    };
+
+    window.closeModal = function() {
+        const modal = document.getElementById('bookingModal');
+        if (!modal) return;
+        modal.classList.remove('active');
+        setTimeout(() => {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            document.body.style.paddingRight = '0px';
+        }, 300);
     };
 
     window.openGeneralModal = function(serviceName) {
@@ -130,6 +241,17 @@ document.addEventListener('DOMContentLoaded', function() {
             window.openGeneralModalShared(serviceName);
         }
     };
+
+    // Auto-open CTA modal when arriving from another page with the query string
+    const urlParams = new URLSearchParams(window.location.search);
+    const autoOpen = urlParams.get('openModal') || urlParams.get('open');
+    if (autoOpen === '1' || autoOpen === 'true' || autoOpen === 'cta') {
+        if (window.location.hash) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        window.openGeneralModal();
+        history.replaceState(null, '', window.location.pathname + window.location.hash);
+    }
 
 // --- Terms & Services Modal Logic ---
 window.openLegalModal = function() {
