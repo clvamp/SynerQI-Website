@@ -337,7 +337,7 @@
                             <label>Treatments</label>
                             <div class="custom-select-wrapper">
                                 <div class="select-box-trigger" id="serviceToggleButton">
-                                    <span id="selectedServicesText">Select Treatments</span>
+                                    <span id="selectedServicesText" style="font-size: 0.9rem; color: #008080;">Select Treatments</span>
                                     <span class="material-icons-round">expand_more</span>
                                 </div>
 
@@ -550,13 +550,10 @@
             return window.innerWidth - document.documentElement.clientWidth;
         }
 
-        window.openGeneralModal = function() {
-            const scrollbarWidth = getScrollbarWidth();
-            document.body.style.paddingRight = `${scrollbarWidth}px`;
-            modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('active'), 10);
-            document.body.style.overflow = 'hidden';
-            updateModalContext(serviceSelect);
+        window.openGeneralModal = function(serviceName) {
+            if (window.openGeneralModalShared) {
+                window.openGeneralModalShared(serviceName);
+            }
         }
 
         window.closeModal = function() {
