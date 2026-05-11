@@ -719,45 +719,6 @@
             backBtn.addEventListener('click', toggleSlides);
         });
 
-        const modal = document.getElementById('bookingModal');
-        const modalImg = document.getElementById('modalImg');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalPrice = document.getElementById('modalPrice');
-        const serviceSelect = document.getElementById('serviceSelect'); 
-        const dateInput = document.getElementById('bookingDate');
-        const today = new Date().toISOString().split('T')[0];
-        dateInput.setAttribute('min', today);
-
-        function getScrollbarWidth() {
-            return window.innerWidth - document.documentElement.clientWidth;
-        }
-
-        function updateModalContext(selectElement) {
-            const selectedOption = selectElement.options[selectElement.selectedIndex];
-            modalTitle.innerText = selectedOption.value;
-            modalPrice.innerText = selectedOption.getAttribute('data-price');
-            modalImg.src = selectedOption.getAttribute('data-img');
-        }
-        window.updateModalContext = updateModalContext;
-
-        window.openModal = function(title, price, imgSrc) {
-            const scrollbarWidth = getScrollbarWidth();
-            document.body.style.paddingRight = `${scrollbarWidth}px`;
-
-            for(let i = 0; i < serviceSelect.options.length; i++) {
-                if (serviceSelect.options[i].value === title) {
-                    serviceSelect.selectedIndex = i;
-                    break;
-                }
-            }
-            
-            updateModalContext(serviceSelect);
-
-            modal.style.display = 'flex';
-            setTimeout(() => { modal.classList.add('active'); }, 10);
-            document.body.style.overflow = 'hidden';
-        }
-
         // Update cart total and selected services display
         function updateCartDisplay() {
             const checkedServices = document.querySelectorAll('.service-check:checked');
@@ -799,51 +760,6 @@
             checkbox.addEventListener('change', updateCartDisplay);
         });
 
-        window.openGeneralModal = function(serviceName) {
-            const scrollbarWidth = getScrollbarWidth();
-            document.body.style.paddingRight = `${scrollbarWidth}px`;
-
-            // If a specific service is provided, check it
-            if (serviceName) {
-                const serviceCheckbox = document.querySelector(`.service-check[value="${serviceName}"]`);
-                if (serviceCheckbox) {
-                    serviceCheckbox.checked = true;
-                    updateCartDisplay();
-                }
-            }
-
-            modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('active'), 10);
-            document.body.style.overflow = 'hidden';
-        }
-
-        window.closeModal = function() {
-            modal.classList.remove('active');
-            setTimeout(() => { 
-                modal.style.display = 'none'; 
-                document.body.style.overflow = 'auto';
-                document.body.style.paddingRight = '0px';
-            }, 300);
-        }
-
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) closeModal();
-        });
-
-        document.getElementById('modalBookingForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const service = document.getElementById('serviceSelect').value;
-            const name = document.getElementById('userName').value;
-            const email = document.getElementById('userEmail').value;
-            const phone = document.getElementById('userPhone').value;
-            const date = document.getElementById('bookingDate').value;
-            const time = document.getElementById('bookingTime').value;
-            const subject = `Booking Request: ${service} - ${name}`;
-            const body = `Hello SynerQi,%0D%0A%0D%0AI would like to book an appointment.%0D%0A%0D%0ADetails:%0D%0AService: ${service}%0D%0AName: ${name}%0D%0AEmail: ${email}%0D%0APhone: ${phone}%0D%0ADate: ${date}%0D%0ATime: ${time}`;
-            window.location.href = `mailto:emantablizo520@gmail.com?subject=${subject}&body=${body}`;
-            closeModal();
-        });
-        
         // filter 
         filterItems();
     </script>
