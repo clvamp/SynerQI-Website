@@ -372,7 +372,7 @@
                             <label>Treatments</label>
                             <div class="custom-select-wrapper">
                                 <div class="select-box-trigger" id="serviceToggleButton">
-                                    <span id="selectedServicesText">Select Treatments</span>
+                                    <span id="selectedServicesText" style="font-size: 0.9rem; color: #008080;">Select Treatments</span>
                                     <span class="material-icons-round">expand_more</span>
                                 </div>
 
@@ -411,7 +411,7 @@
                                             <span>Physical Exercise - ₱800</span>
                                         </label>
                                         <label class="check-item">
-                                            <input type="checkbox" class="service-check" value="3D Acu & Myofascial" data-price="4000">
+                                            <input type="checkbox" class="service-check" value="3D Acu & Myofascial Pain Management" data-price="4000">
                                             <span>3D Acu & Myofascial - ₱4,000</span>
                                         </label>
                                     </div>
@@ -598,14 +598,24 @@
         const filterStatus = document.getElementById('filterStatus');
 
         function updateFeedback() {
-            const activeBtn = document.querySelector('.filter-btn.active');
-            const category = activeBtn.getAttribute('data-filter');
+            const activeBtns = document.querySelectorAll('.filter-btn.active:not(#resetFilters)');
+            const activeCategories = Array.from(activeBtns).map(btn => btn.getAttribute('data-filter'));
             const term = searchInput.value.toLowerCase();
-            let catText = category === 'all' ? 'All Services' : category.charAt(0).toUpperCase() + category.slice(1);
+            
+            // If 'all' is selected or no buttons selected, show all
+            const showAll = activeCategories.includes('all') || activeCategories.length === 0;
+            
+            let catText;
+            if (showAll) {
+                catText = 'All Services';
+            } else {
+                catText = activeCategories.map(cat => cat.charAt(0).toUpperCase() + cat.slice(1)).join(', ');
+            }
+            
             let searchText = term ? ` + keyword "${term}"` : '';
             filterStatus.innerHTML = `Currently viewing: <strong>${catText}${searchText}</strong>`;
             
-            if(category !== 'all' || term !== '') {
+            if(!showAll || term !== '') {
                 resetBtn.style.display = 'inline-flex';
             } else {
                 resetBtn.style.display = 'none';
@@ -613,9 +623,14 @@
         }
 
         function filterItems() {
-            const category = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+            const activeBtns = document.querySelectorAll('.filter-btn.active:not(#resetFilters)');
+            const activeCategories = Array.from(activeBtns).map(btn => btn.getAttribute('data-filter'));
             const term = searchInput.value.toLowerCase();
             let visibleCount = 0;
+            
+            // If 'all' is selected or no buttons selected, show all
+            const showAll = activeCategories.includes('all') || activeCategories.length === 0;
+            
             cards.forEach(card => {
                 const itemCat = card.getAttribute('data-category');
                 
@@ -625,7 +640,8 @@
                 
                 const text = title + " " + bullets + " " + details;
 
-                const matchesCategory = (category === 'all' || itemCat === category);
+                // Show if 'all' is selected, or if item category matches any selected category
+                const matchesCategory = showAll || activeCategories.includes(itemCat);
                 const matchesSearch = text.includes(term);
                 
                 if (matchesCategory && matchesSearch) {
@@ -644,8 +660,22 @@
 
         filterBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                filterBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
+                const allBtn = document.querySelector('.filter-btn[data-filter="all"]');
+                const clickedFilter = btn.getAttribute('data-filter');
+                
+                if (clickedFilter === 'all') {
+                    // If "All" is clicked, deselect all others and select only "All"
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                } else {
+                    // If a specific category is clicked
+                    if (allBtn.classList.contains('active')) {
+                        // If "All" is currently selected, deselect it and select this button
+                        allBtn.classList.remove('active');
+                    }
+                    // Toggle the clicked button
+                    btn.classList.toggle('active');
+                }
                 filterItems();
             });
         });
@@ -653,7 +683,6 @@
         resetBtn.addEventListener('click', () => {
             searchInput.value = '';
             filterBtns.forEach(b => b.classList.remove('active'));
-            document.querySelector('.filter-btn[data-filter="all"]').classList.add('active');
             filterItems();
         });
 
@@ -729,14 +758,63 @@
             document.body.style.overflow = 'hidden';
         }
 
-        window.openGeneralModal = function() {
+        // Update cart total and selected services display
+        function updateCartDisplay() {
+            const checkedServices = document.querySelectorAll('.service-check:checked');
+            let total = 0;
+            let serviceNames = [];
+            
+            checkedServices.forEach(service => {
+                const price = parseInt(service.getAttribute('data-price')) || 0;
+                total += price;
+                serviceNames.push(service.value);
+            });
+            
+            document.getElementById('cartTotal').innerText = '₱' + total.toLocaleString();
+            document.getElementById('servicesComma').innerText = serviceNames.length > 0 ? serviceNames.join(', ') : 'No services selected';
+            
+            // Update the dropdown trigger text
+            const selectedServicesText = document.getElementById('selectedServicesText');
+            if (serviceNames.length > 0) {
+                selectedServicesText.innerText = serviceNames.join(', ');
+            } else {
+                selectedServicesText.innerText = 'Select Treatments';
+            }
+            
+            // Update the details list for desktop
+            const servicesList = document.getElementById('servicesList');
+            if (serviceNames.length > 0) {
+                servicesList.innerHTML = serviceNames.map(name => `<li>${name}</li>`).join('');
+            } else {
+                servicesList.innerHTML = '<li class="no-services">No services selected</li>';
+            }
+            
+            // Update hidden inputs for form submission
+            document.getElementById('totalAmountInput').value = total;
+            document.getElementById('servicesListInput').value = serviceNames.join(', ');
+        }
+
+        // Add event listeners to service checkboxes
+        document.querySelectorAll('.service-check').forEach(checkbox => {
+            checkbox.addEventListener('change', updateCartDisplay);
+        });
+
+        window.openGeneralModal = function(serviceName) {
             const scrollbarWidth = getScrollbarWidth();
             document.body.style.paddingRight = `${scrollbarWidth}px`;
+
+            // If a specific service is provided, check it
+            if (serviceName) {
+                const serviceCheckbox = document.querySelector(`.service-check[value="${serviceName}"]`);
+                if (serviceCheckbox) {
+                    serviceCheckbox.checked = true;
+                    updateCartDisplay();
+                }
+            }
 
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('active'), 10);
             document.body.style.overflow = 'hidden';
-            updateModalContext(serviceSelect);
         }
 
         window.closeModal = function() {
