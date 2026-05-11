@@ -430,6 +430,7 @@
         </div>
     </div>
 
+    <!-- VALIDATION NOTICE -->
     <div id="validationNoticeModal" class="notice-overlay">
         <div class="notice-box">
             <div class="notice-header">
